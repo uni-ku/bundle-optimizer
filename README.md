@@ -2,12 +2,15 @@
 
 > [!TIP]
 > uni-app 分包优化插件化实现
+>
 > 前往 <https://github.com/dcloudio/uni-app/issues/5025> 查看本项目立项背景。
+>
 > 前往 <https://github.com/Vanisper/uniapp-bundle-optimizer> 查看本插件详细发展过程与提交记录。
 
 ### 🎏 功能与支持
 
 > ！<b style="color: red;">暂时没有对App平台做兼容性实现</b>
+>
 > 适用于 Uniapp - CLI 或 HBuilderX 创建的 Vue3 项目
 
 - 分包优化
@@ -49,7 +52,6 @@ export default defineConfig(async ({ mode, command }) => {
 需要修改 manifest.json 中的 `mp-weixin.optimization.subPackages` 配置项为 true，开启方法与vue2版本的uniapp一致。
 
 ```json
-// manifest.json
 {
   "mp-weixin": {
     "optimization": {
@@ -68,7 +70,6 @@ export default defineConfig(async ({ mode, command }) => {
 当然，如果原来的配置已经覆盖到了这两个文件，就可以不加；如果没有运行项目的时候，这两个文件不会生成。
 
 ```json
-// tsconfig.json
 {
   "include": [
     "async-import.d.ts",
@@ -82,6 +83,7 @@ export default defineConfig(async ({ mode, command }) => {
 - **详见 <https://developers.weixin.qq.com/miniprogram/dev/framework/subpackages/async.html>**
 
 > 这两个类型文件不会对项目的运行产生任何影响，只是为了让编辑器能够正确的识别本插件定义的自定义语法、类型。
+>
 > 这两个文件可以加入到 `.gitignore` 中，不需要提交到代码仓库。
 
 ### ✨ 例子
