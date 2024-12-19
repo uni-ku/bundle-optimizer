@@ -8,7 +8,7 @@
     "strings": "on"
   },
   "editor.formatOnSave": false,
-  "eslint.experimental.useFlatConfig": true,
+  "eslint.useFlatConfig": true,
   "eslint.validate": [
     "svelte",
     "astro",
@@ -22,5 +22,5 @@
     "yml",
     "markdown",
     "toml"
-  ],
+  ]
 }
