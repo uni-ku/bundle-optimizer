@@ -89,32 +89,34 @@ jobs:
           docs_messages=("${{ steps.extract_commit_messages.outputs.docs_messages }}")
           perf_messages=("${{ steps.extract_commit_messages.outputs.perf_messages }}")
 
+          release_notes=""
+
           if [[ -n "$feat_messages" ]]; then
             release_notes="$release_notes\n### 🚀 Features 新功能:  \n"
-            for message in "${feat_messages[@]}"; do
+            while IFS= read -r message; do
               release_notes="$release_notes\n- $message"
-            done
+            done <<< "$feat_messages"
           fi
 
           if [[ -n "$fix_messages" ]]; then
             release_notes="$release_notes\n### 🩹 Fixes 缺陷修复:  \n"
-            for message in "${fix_messages[@]}"; do
+            while IFS= read -r message; do
               release_notes="$release_notes\n- $message"
-            done
+            done <<< "$fix_messages"
           fi
 
           if [[ -n "$docs_messages" ]]; then
             release_notes="$release_notes\n### 📖 Documentation 文档:  \n"
-            for message in "${docs_messages[@]}"; do
+            while IFS= read -r message; do
               release_notes="$release_notes\n- $message"
-            done
+            done <<< "$docs_messages"
           fi
 
           if [[ -n "$perf_messages" ]]; then
             release_notes="$release_notes\n### 🔥 Performance 性能优化:  \n"
-            for message in "${perf_messages[@]}"; do
+            while IFS= read -r message; do
               release_notes="$release_notes\n- $message"
-            done
+            done <<< "$perf_messages"
           fi
           echo "release_notes=$release_notes" >> $GITHUB_OUTPUT
 
