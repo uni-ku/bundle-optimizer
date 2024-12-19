@@ -3,21 +3,48 @@
   "type": "module",
   "version": "0.0.1",
   "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
   "scripts": {
+    "build": "unbuild",
+    "dev": "unbuild --stub",
     "prepare": "simple-git-hooks",
     "lint": "eslint . --fix",
     "commit": "git-cz"
+  },
+  "peerDependencies": {
+    "rollup": ">=4.0.0",
+    "typescript": ">=5.5.0",
+    "vite": ">=5.0.0"
+  },
+  "dependencies": {
+    "@dcloudio/uni-cli-shared": "3.0.0-4020820240925001",
+    "@node-rs/xxhash": "^1.7.6",
+    "magic-string": "^0.30.17",
+    "minimatch": "^10.0.1",
+    "typescript": "^5.5.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.12.0",
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
+    "@types/node": "^22.10.2",
     "commitizen": "^4.3.0",
     "cz-git": "^1.9.1",
     "eslint": "^9.17.0",
     "lint-staged": "^15.2.2",
+    "rollup": "^4.0.0",
     "simple-git-hooks": "^2.11.1",
-    "typescript": "^5.4.5"
+    "unbuild": "^2.0.0",
+    "vite": "^5.0.0"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged",
