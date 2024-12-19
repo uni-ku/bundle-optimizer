@@ -1,18 +1,20 @@
 {
-  "name": "quick-template",
+  "name": "@uni-ku/bundle-optimizer",
   "type": "module",
   "version": "0.0.1",
   "sideEffects": false,
   "scripts": {
     "prepare": "simple-git-hooks",
-    "lint": "eslint . --fix"
+    "lint": "eslint . --fix",
+    "commit": "git-cz"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^3.12.0",
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
     "commitizen": "^4.3.0",
     "cz-git": "^1.9.1",
-    "eslint": "^9.3.0",
+    "eslint": "^9.17.0",
     "lint-staged": "^15.2.2",
     "simple-git-hooks": "^2.11.1",
     "typescript": "^5.4.5"
