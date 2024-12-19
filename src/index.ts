@@ -1,9 +1,10 @@
+import type { PluginOption } from 'vite'
 import type { IOptimizationOptions } from './type'
 import AsyncComponent from './async-component'
 import AsyncImport from './async-import'
 import UniappSubPackagesOptimization from './main'
 
-export default (options: IOptimizationOptions) => {
+export default (options: IOptimizationOptions): PluginOption => {
   return [
     // 分包优化
     UniappSubPackagesOptimization(),

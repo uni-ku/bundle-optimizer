@@ -2,6 +2,26 @@
   "name": "@uni-ku/bundle-optimizer",
   "type": "module",
   "version": "0.0.1",
+  "description": "uni-app 分包优化插件化实现",
+  "author": {
+    "name": "Vanisper",
+    "email": "273266469@qq.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/uni-ku/bundle-optimizer#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uni-ku/bundle-optimizer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/uni-ku/bundle-optimizer/issues"
+  },
+  "keywords": [
+    "Uniapp",
+    "Vue",
+    "Vite",
+    "Vite-Plugin"
+  ],
   "sideEffects": false,
   "exports": {
     ".": {
@@ -12,10 +32,13 @@
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "unbuild",
     "dev": "unbuild --stub",
+    "release": "npm run build && bumpp",
     "prepare": "simple-git-hooks",
     "lint": "eslint . --fix",
     "commit": "git-cz"
@@ -37,6 +60,7 @@
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
     "@types/node": "^22.10.2",
+    "bumpp": "^9.9.1",
     "commitizen": "^4.3.0",
     "cz-git": "^1.9.1",
     "eslint": "^9.17.0",
