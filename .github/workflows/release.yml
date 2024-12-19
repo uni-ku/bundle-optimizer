@@ -52,7 +52,7 @@ jobs:
           # echo "fix_messages=(${fix_messages[@]})" >> $GITHUB_OUTPUT
           # echo "docs_messages=(${docs_messages[@]})" >> $GITHUB_OUTPUT
           # echo "perf_messages=(${perf_messages[@]})" >> $GITHUB_OUTPUT
-          
+
           {
             echo 'feat_messages<<EOF'
             echo "$commit_messages" | grep 'feat' || true
@@ -78,7 +78,7 @@ jobs:
         id: get_branch_name
         run: |
           branch_name=$(git rev-parse --abbrev-ref HEAD)
-          echo "::set-output name=branch_name::$branch_name"
+          echo "branch_name=$branch_name" >> $GITHUB_OUTPUT
 
       - name: 发版详情
         id: generate_release_notes
