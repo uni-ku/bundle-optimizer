@@ -38,6 +38,10 @@ jobs:
           else
             commit_messages=$(git log --pretty=format:"%s - by @%an (%h)" "$previous_tag".."$current_tag" | grep -E 'feat|fix|docs|perf')
           fi
+
+          # 转义 ` 字符
+          commit_messages=$(echo "$commit_messages" | sed 's/`/\\\`/g')
+
           # feat_messages=$(echo "$commit_messages" | grep 'feat' || true)
           # fix_messages=$(echo "$commit_messages" | grep 'fix' || true)
           # docs_messages=$(echo "$commit_messages" | grep 'docs' || true)
@@ -118,6 +122,9 @@ jobs:
               release_notes="$release_notes\n- $message"
             done <<< "$perf_messages"
           fi
+
+          # 转义 ` 字符
+          release_notes=$(echo "$release_notes" | sed 's/`/\\\`/g')
           echo "release_notes=$release_notes" >> $GITHUB_OUTPUT
 
       - name: 写入生成的发布说明到 changelog.md
