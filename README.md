@@ -1,4 +1,7 @@
-# @uni-ku/bundle-optimizer
+# @uni-ku/bundle-optimizer <a href="https://www.npmjs.com/package/@uni-ku/bundle-optimizer"><img src="https://img.shields.io/npm/v/@uni-ku/bundle-optimizer" alt="npm package"></a>
+
+[![NPM downloads](https://img.shields.io/npm/dm/@uni-ku/bundle-optimizer?label=downloads)](https://www.npmjs.com/package/@uni-ku/bundle-optimizer)
+[![LICENSE](https://img.shields.io/github/license/uni-ku/bundle-optimizer?style=flat&label=license)](https://github.com/uni-ku/bundle-optimizer#readme)
 
 > [!TIP]
 > uni-app 分包优化插件化实现
@@ -36,14 +39,11 @@ import Uni from '@dcloudio/vite-plugin-uni'
 import Optimization from '@uni-ku/bundle-optimizer'
 import { defineConfig } from 'vite'
 
-export default defineConfig(async ({ mode, command }) => {
-  return {
-    plugins: [
-      // 需要将这两个变量传入插件
-      Optimization({ mode, command }),
-      Uni()
-    ],
-  }
+export default defineConfig({
+  plugins: [
+    Uni(),
+    Optimization(),
+  ],
 })
 ```
 
