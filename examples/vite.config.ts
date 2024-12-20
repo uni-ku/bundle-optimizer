@@ -1,4 +1,3 @@
-/* eslint-disable ts/ban-ts-comment */
 import { fileURLToPath, URL } from 'node:url'
 import Uni from '@dcloudio/vite-plugin-uni'
 import Optimization from '@uni-ku/bundle-optimizer'
@@ -8,7 +7,6 @@ export default defineConfig(({ command, mode }) => {
   return {
     plugins: [
       Uni(),
-      // @ts-ignore
       Optimization({ command, mode }),
     ],
     resolve: {

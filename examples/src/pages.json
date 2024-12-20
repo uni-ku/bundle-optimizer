@@ -24,6 +24,17 @@
           }
         }
       ]
+    },
+    {
+      "root": "pages-sub-async",
+      "pages": [
+        {
+          "path": "index",
+          "style": {
+            "navigationBarTitleText": "pages-sub-async"
+          }
+        }
+      ]
     }
   ]
 }
