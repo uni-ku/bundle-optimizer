@@ -13,5 +13,17 @@
     "navigationBarBackgroundColor": "#F8F8F8",
     "backgroundColor": "#F8F8F8"
   },
-  "subPackages": []
+  "subPackages": [
+    {
+      "root": "pages-sub-demo",
+      "pages": [
+        {
+          "path": "index",
+          "style": {
+            "navigationBarTitleText": "子包示例"
+          }
+        }
+      ]
+    }
+  ]
 }
