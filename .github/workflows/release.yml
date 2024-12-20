@@ -73,7 +73,7 @@ jobs:
             echo "$commit_messages" | grep 'perf' || true
             echo 'EOF'
           } >> $GITHUB_OUTPUT
-          
+
       - name: 获取当前分支名
         id: get_branch_name
         run: |
