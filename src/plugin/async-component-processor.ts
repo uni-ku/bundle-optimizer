@@ -23,7 +23,6 @@ export function AsyncComponentProcessor(): Plugin {
 
   return {
     name: 'async-component-processor',
-    enforce: 'post',
     async transform(source, importer) {
       // 热更新时，由于含有 async 查询参数的导入语句会删除查询部分（为的是避免后续编译处理识别不来该语句）
       // 所以热更新代码时，已经被处理过的代码再次处理时，原本应该被处理的相关查询参数代码已经被删除了，将不会再处理该代码文件

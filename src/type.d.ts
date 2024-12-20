@@ -1,5 +1,5 @@
 export interface IOptimizationOptions {
-  mode: 'development' | 'production'
+  mode: 'development' | 'production' | string
   command: 'serve' | 'build'
 }
 
