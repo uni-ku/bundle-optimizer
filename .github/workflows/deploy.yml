@@ -1,0 +1,42 @@
+name: Deploy to GitHub Pages
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch: # 允许手动触发
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20 # Node.js 版本
+          cache: pnpm # 缓存 pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build Project
+        run: pnpm run example:build:h5
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./examples/dist/build/h5 # 构建输出目录
