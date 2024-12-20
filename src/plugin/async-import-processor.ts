@@ -62,7 +62,7 @@ export function AsyncImportProcessor(options: IOptimizationOptions): Plugin {
     },
     renderDynamicImport(options) {
       const cache = AsyncImportsInstance.getCache(moduleIdProcessor(options.moduleId))
-      if (cache && options.targetModuleId && !isApp) {
+      if (cache && options.targetModuleId && !isApp && !isH5) {
         // 如果是js文件的话去掉后缀
         const targetModuleId = moduleIdProcessor(options.targetModuleId).replace(JS_TYPES_RE, '')
         if (cache.map(item => resolveAliasPath(item, true).replace(SRC_DIR_RE, 'src/'))
