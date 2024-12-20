@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Build Library
+        run: pnpm run build
+
       - name: Build Project
         run: pnpm run example:build:h5
 
