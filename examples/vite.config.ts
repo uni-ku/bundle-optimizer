@@ -4,6 +4,7 @@ import Optimization from '@uni-ku/bundle-optimizer'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+  base: './',
   plugins: [
     Uni(),
     Optimization(),
