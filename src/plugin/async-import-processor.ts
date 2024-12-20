@@ -1,7 +1,6 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import type { OutputChunk } from 'rollup'
 import type { Plugin } from 'vite'
-import type { IOptimizationOptions } from '../type'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
@@ -18,7 +17,7 @@ import { ensureDirectoryExists, moduleIdProcessor, parseAsyncImports, resolveAli
  *
  * TODO: 暂时不支持app端：首先由于app端实用的是iife模式，代码内容中无法使用`import()`语法，直接会编译报错
  */
-export function AsyncImportProcessor(options: IOptimizationOptions): Plugin {
+export function AsyncImportProcessor(): Plugin {
   const platform = process.env.UNI_PLATFORM
   /** 是否小程序 */
   const isMP = platform?.startsWith('mp')
