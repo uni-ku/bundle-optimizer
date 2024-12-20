@@ -35,10 +35,15 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "unbuild",
     "dev": "unbuild --stub",
     "release": "npm run build && bumpp",
+    "prepublishOnly": "npm run build",
     "prepare": "simple-git-hooks",
     "lint": "eslint . --fix",
     "commit": "git-cz"
