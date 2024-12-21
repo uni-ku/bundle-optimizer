@@ -39,7 +39,8 @@ export function UniappSubPackagesOptimization(): Plugin {
   const subPkgsInfo: ISubPkgsInfo[] = Object.values(UNI_SUBPACKAGES)
   const normalFilter = ({ independent }: ISubPkgsInfo) => !independent
   const independentFilter = ({ independent }: ISubPkgsInfo) => independent
-  const map2Root = ({ root }: ISubPkgsInfo) => `${root}/`
+  /** 先去除尾部的`/`，再添加`/`，兼容pages.json中以`/`结尾的路径 */
+  const map2Root = ({ root }: ISubPkgsInfo) => `${root.replace(/\/$/, '')}/`
   const subPackageRoots = subPkgsInfo.map(map2Root)
   const normalSubPackageRoots = subPkgsInfo.filter(normalFilter).map(map2Root)
   const independentSubpackageRoots = subPkgsInfo.filter(independentFilter).map(map2Root)
