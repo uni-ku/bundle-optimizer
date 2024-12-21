@@ -44,7 +44,7 @@
     "dev": "unbuild --stub",
     "release": "npm run build && bumpp",
     "prepublishOnly": "npm run build",
-    "prepare": "simple-git-hooks",
+    "prepare": "simple-git-hooks && npm run build",
     "lint": "eslint . --fix",
     "commit": "git-cz",
     "example:dev:h5": "npm -C examples run dev",
