@@ -23,7 +23,6 @@ export function AsyncComponentProcessor(): Plugin {
 
   /** 生成类型定义文件 */
   function generateTypeFile(parseResult?: ReturnType<typeof lexDefaultImportWithQuery>) {
-    // #region 提取引入路径数组，生成类型定义文件
     const typesFilePath = path.resolve(ROOT_DIR, 'async-component.d.ts')
     ensureDirectoryExists(typesFilePath)
     let cache: string[] = [] // 缓存已经生成的类型定义，防止开发阶段热更新时部分类型定义生成丢失
@@ -33,7 +32,6 @@ export function AsyncComponentProcessor(): Plugin {
     }
     const typeDefinition = generateModuleDeclaration(parseResult, cache)
     fs.writeFileSync(typesFilePath, typeDefinition)
-    // #endregion
   }
   generateTypeFile() // 初始化类型定义文件
 

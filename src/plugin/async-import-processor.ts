@@ -7,7 +7,7 @@ import process from 'node:process'
 import MagicString from 'magic-string'
 import { AsyncImports } from '../common/AsyncImports'
 import { JS_TYPES_RE, ROOT_DIR, SRC_DIR_RE } from '../constants'
-import { ensureDirectoryExists, moduleIdProcessor, parseAsyncImports, resolveAliasPath, resolveAssetsPath } from '../utils'
+import { ensureDirectoryExists, lexFunctionCalls, moduleIdProcessor, parseAsyncImports, resolveAliasPath, resolveAssetsPath } from '../utils'
 
 /**
  * 负责处理`AsyncImport`函数调用的传参路径
@@ -27,11 +27,16 @@ export function AsyncImportProcessor(): Plugin {
   const isApp = platform === 'app'
   const AsyncImportsInstance = new AsyncImports()
 
-  /** 提取引入路径数组，生产类型定义文件 */
+  /** 生成类型定义文件 */
   function generateTypeFile(paths?: string[]) {
-    const typeDefinition = generateTypeDefinition(paths)
     const typesFilePath = path.resolve(ROOT_DIR, 'async-import.d.ts')
     ensureDirectoryExists(typesFilePath)
+    let cache: string[] = [] // 缓存已经生成的类型定义，防止开发阶段热更新时部分类型定义生成丢失
+    if (fs.existsSync(typesFilePath)) {
+      const list = lexFunctionCalls(fs.readFileSync(typesFilePath, 'utf-8'), 'import').flatMap(({ args }) => args.map(({ value }) => value.toString()))
+      list && list.length && (cache = Array.from(new Set(list)))
+    }
+    const typeDefinition = generateModuleDeclaration(paths, cache)
     fs.writeFileSync(typesFilePath, typeDefinition)
   }
   generateTypeFile() // 初始化类型定义文件
@@ -172,9 +177,9 @@ export function AsyncImportProcessor(): Plugin {
 /**
  * 生成类型定义
  */
-function generateTypeDefinition(paths?: string[]): string {
+function generateModuleDeclaration(paths?: string[], cache?: string[]): string {
   // 将路径组合成 ModuleMap 中的键
-  const moduleMapEntries = paths
+  const moduleMapEntries = Array.from(new Set([...(cache || []), ...(paths || [])]))
     ?.map((p) => {
       return `  '${p}': typeof import('${p}')`
     })
