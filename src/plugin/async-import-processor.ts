@@ -176,7 +176,10 @@ function generateTypeDefinition(paths: string[]): string {
     .join('\n')
 
   // 返回类型定义
-  return `export {}
+  return `/* eslint-disable */
+/* prettier-ignore */
+// @ts-nocheck
+export {}
 
 interface ModuleMap {
 ${moduleMapEntries}

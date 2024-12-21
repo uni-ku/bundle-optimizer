@@ -157,6 +157,15 @@ export function AsyncComponentProcessor(): Plugin {
 function generateModuleDeclaration(parsedResults: ReturnType<typeof lexDefaultImportWithQuery>, cache?: string[]): string {
   let typeDefs = ''
 
+  const prefixList = [
+    '/* eslint-disable */',
+    '/* prettier-ignore */',
+    '// @ts-nocheck',
+  ]
+  prefixList.forEach((prefix) => {
+    typeDefs += `${prefix}\n`
+  })
+
   // 生成 declare module 语句
   function generateDeclareModule(modulePath: string | number, fullPath: string | number) {
     typeDefs += `declare module '${fullPath}' {\n`
