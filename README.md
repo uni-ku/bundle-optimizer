@@ -164,6 +164,24 @@ import AsyncComponent from 'xxxxx.vue?async'
 |[Uni Ku](https://github.com/uni-ku)|有很多 Uniapp(Uni) 的酷(Ku) 😎|
 |[Wot Design Uni](https://github.com/Moonofweisheng/wot-design-uni/)|一个基于Vue3+TS开发的uni-app组件库，提供70+高质量组件|
 
+### 💖 赞赏
+
+如果我的工作帮助到了您，可以请我吃辣条，使我能量满满 ⚡
+
+> 请留下您的Github用户名，感谢 ❤
+
+#### 微信赞赏
+
+<img src="https://fastly.jsdelivr.net/gh/Vanisper/sponsors@main/assets/wechat-pay.png" alt="wechat-pay" width="320" />
+
+#### 赞赏榜单
+
+<p align="center">
+  <a href="https://github.com/Vanisper/sponsors">
+    <img alt="sponsors" src="https://fastly.jsdelivr.net/gh/Vanisper/Vanisper@main/sponsors.svg"/>
+  </a>
+</p>
+
 ---
 
 <p align="center">
