@@ -13,6 +13,7 @@
     "@dcloudio/uni-components": "3.0.0-4020820240925001",
     "@dcloudio/uni-h5": "3.0.0-4020820240925001",
     "@dcloudio/uni-mp-weixin": "3.0.0-4020820240925001",
+    "lodash": "^4.17.21",
     "vue": "3.4.21"
   },
   "devDependencies": {
@@ -20,6 +21,7 @@
     "@dcloudio/uni-automator": "3.0.0-4020820240925001",
     "@dcloudio/uni-cli-shared": "3.0.0-4020820240925001",
     "@dcloudio/vite-plugin-uni": "3.0.0-4020820240925001",
+    "@types/lodash": "^4.17.13",
     "@uni-ku/bundle-optimizer": "workspace:*"
   }
 }

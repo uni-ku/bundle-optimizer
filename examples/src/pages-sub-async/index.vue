@@ -1,6 +1,7 @@
 <!-- eslint-disable no-console -->
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
+import groupBy from 'lodash/groupBy'
 
 /** 刷新页面 */
 function refresh() {
@@ -31,7 +32,10 @@ onMounted(() => {
     <view>异步引入vue文件结果 =></view>
     <template v-if="result">
       <view>------</view>
-      <view>{{ result }}</view>
+      <view>{{ groupBy([result, result], '__name') }}</view>
+      <view class="desc">
+        此处使用了lodash的groupBy方法，可以表现出分包优化的效果，可使用微信开发者工具查看分包情况
+      </view>
     </template>
     <view v-else>
       <view class="center">
@@ -48,5 +52,11 @@ onMounted(() => {
   font-size: 20px;
   font-weight: bolder;
   text-align: center;
+}
+
+.desc {
+  color: gray;
+  font-size: 12px;
+  font-weight: bold;
 }
 </style>
