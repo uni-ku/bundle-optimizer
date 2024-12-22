@@ -178,7 +178,7 @@ import AsyncComponent from 'xxxxx.vue?async'
 
 <p align="center">
   <a href="https://github.com/Vanisper/sponsors">
-    <img alt="sponsors" src="https://fastly.jsdelivr.net/gh/Vanisper/Vanisper@main/sponsors.svg"/>
+    <img alt="sponsors" src="https://fastly.jsdelivr.net/gh/Vanisper/sponsors@main/sponsors.svg"/>
   </a>
 </p>
 
