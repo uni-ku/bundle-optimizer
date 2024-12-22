@@ -170,9 +170,20 @@ import AsyncComponent from 'xxxxx.vue?async'
 
 > 请留下您的Github用户名，感谢 ❤
 
-#### 微信赞赏
+#### 直接赞助
 
-<img src="https://fastly.jsdelivr.net/gh/Vanisper/sponsors@main/assets/wechat-pay.png" alt="wechat-pay" width="320" />
+<table style="width: 100%; text-align: center;">
+  <tr>
+    <td>
+      <img src="https://fastly.jsdelivr.net/gh/Vanisper/sponsors@main/assets/wechat-pay.png" alt="wechat-pay" height="360" />
+      <p align="center">微信</p>
+    </td>
+    <td>
+      <img src="https://fastly.jsdelivr.net/gh/Vanisper/sponsors@main/assets/alipay.png" alt="alipay" height="360" />
+      <p align="center">支付宝</p>
+    </td>
+  </tr>
+</table>
 
 #### 赞赏榜单
 
