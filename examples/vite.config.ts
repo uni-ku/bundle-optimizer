@@ -7,7 +7,12 @@ export default defineConfig({
   base: './',
   plugins: [
     Uni(),
-    Optimization(),
+    Optimization({
+      dts: {
+        asyncImport: 'src/types/async-import.d.ts',
+        asyncComponent: 'src/types/async-component.d.ts',
+      },
+    }),
   ],
   resolve: {
     alias: {

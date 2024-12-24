@@ -17,8 +17,6 @@
     "esModuleInterop": true
   },
   "include": [
-    "async-import.d.ts",
-    "async-component.d.ts",
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",

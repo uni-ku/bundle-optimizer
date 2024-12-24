@@ -1,7 +1,7 @@
-import { AsyncComponentProcessor } from './plugin/async-component-processor'
+import { AsyncComponentProcessor, type AsyncComponentProcessorOptions } from './plugin/async-component-processor'
 
-export default () => {
+export default (options: AsyncComponentProcessorOptions = {}) => {
   return [
-    AsyncComponentProcessor(),
+    AsyncComponentProcessor(options),
   ]
 }

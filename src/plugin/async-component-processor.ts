@@ -9,31 +9,50 @@ import { AsyncComponents, type TemplateDescriptor } from '../common/AsyncCompone
 import { ROOT_DIR } from '../constants'
 import { type ArgumentLocation, calculateRelativePath, ensureDirectoryExists, findFirstNonConsecutiveBefore, kebabCase, lexDefaultImportWithQuery, lexFunctionCalls, resolveAliasPath } from '../utils'
 
+export interface AsyncComponentProcessorOptions {
+  /**
+   * 生成的类型声明文件路径
+   * @default 'async-component.d.ts'
+   */
+  dts?: string | false
+}
+
 /**
  * 处理 `import xxx from "*.vue?async"` 形式的调用
  * @description `transform`阶段处理识别以上形式的导入语句，做相关的缓存处理；并将`?async`查询参数去除，避免后续编译处理识别不来该语句
  * @description `generateBundle`阶段处理生成相关页面的 page-json 文件，注入`componentPlaceholder`配置
  */
-export function AsyncComponentProcessor(): Plugin {
+export function AsyncComponentProcessor(options: AsyncComponentProcessorOptions = {}): Plugin {
   const inputDir = process.env.UNI_INPUT_DIR
   const platform = process.env.UNI_PLATFORM
   const AsyncComponentsInstance = new AsyncComponents()
 
   const isMP = platform?.startsWith('mp-')
 
+  // 处理dts配置
+  const dtsPath = options.dts === false
+    ? ''
+    : typeof options.dts === 'string'
+      ? path.resolve(ROOT_DIR, options.dts)
+      : path.resolve(ROOT_DIR, 'async-component.d.ts')
+
   /** 生成类型定义文件 */
   function generateTypeFile(parseResult?: ReturnType<typeof lexDefaultImportWithQuery>) {
-    const typesFilePath = path.resolve(ROOT_DIR, 'async-component.d.ts')
-    ensureDirectoryExists(typesFilePath)
-    let cache: string[] = [] // 缓存已经生成的类型定义，防止开发阶段热更新时部分类型定义生成丢失
-    if (fs.existsSync(typesFilePath)) {
-      const list = lexFunctionCalls(fs.readFileSync(typesFilePath, 'utf-8'), 'import').flatMap(({ args }) => args.map(({ value }) => value.toString()))
+    if (!dtsPath)
+      return // 如果dts为false则不生成文件
+
+    ensureDirectoryExists(dtsPath)
+    let cache: string[] = []
+    if (fs.existsSync(dtsPath)) {
+      const list = lexFunctionCalls(fs.readFileSync(dtsPath, 'utf-8'), 'import').flatMap(({ args }) => args.map(({ value }) => value.toString()))
       list && list.length && (cache = Array.from(new Set(list)))
     }
     const typeDefinition = generateModuleDeclaration(parseResult, cache)
-    fs.writeFileSync(typesFilePath, typeDefinition)
+    fs.writeFileSync(dtsPath, typeDefinition)
   }
-  generateTypeFile() // 初始化类型定义文件
+
+  // 只有在需要生成类型文件时才初始化
+  dtsPath && generateTypeFile()
 
   return {
     name: 'async-component-processor',

@@ -9,6 +9,14 @@ import { AsyncImports } from '../common/AsyncImports'
 import { JS_TYPES_RE, ROOT_DIR, SRC_DIR_RE } from '../constants'
 import { ensureDirectoryExists, lexFunctionCalls, moduleIdProcessor, parseAsyncImports, resolveAliasPath, resolveAssetsPath } from '../utils'
 
+export interface AsyncImportProcessorOptions {
+  /**
+   * 生成的类型声明文件路径
+   * @default 'async-import.d.ts'
+   */
+  dts?: string | false
+}
+
 /**
  * 负责处理`AsyncImport`函数调用的传参路径
  *
@@ -17,7 +25,7 @@ import { ensureDirectoryExists, lexFunctionCalls, moduleIdProcessor, parseAsyncI
  *
  * TODO: 暂时不支持app端：首先由于app端实用的是iife模式，代码内容中无法使用`import()`语法，直接会编译报错
  */
-export function AsyncImportProcessor(): Plugin {
+export function AsyncImportProcessor(options: AsyncImportProcessorOptions = {}): Plugin {
   const platform = process.env.UNI_PLATFORM
   /** 是否小程序 */
   const isMP = platform?.startsWith('mp')
@@ -27,19 +35,28 @@ export function AsyncImportProcessor(): Plugin {
   const isApp = platform === 'app'
   const AsyncImportsInstance = new AsyncImports()
 
+  // 处理dts配置
+  const dtsPath = options.dts === false
+    ? ''
+    : typeof options.dts === 'string'
+      ? path.resolve(ROOT_DIR, options.dts)
+      : path.resolve(ROOT_DIR, 'async-import.d.ts')
+
   /** 生成类型定义文件 */
   function generateTypeFile(paths?: string[]) {
-    const typesFilePath = path.resolve(ROOT_DIR, 'async-import.d.ts')
-    ensureDirectoryExists(typesFilePath)
-    let cache: string[] = [] // 缓存已经生成的类型定义，防止开发阶段热更新时部分类型定义生成丢失
-    if (fs.existsSync(typesFilePath)) {
-      const list = lexFunctionCalls(fs.readFileSync(typesFilePath, 'utf-8'), 'import').flatMap(({ args }) => args.map(({ value }) => value.toString()))
+    if (!dtsPath)
+      return // 如果dts为false则不生成文件
+    ensureDirectoryExists(dtsPath)
+    let cache: string[] = []
+    if (fs.existsSync(dtsPath)) {
+      const list = lexFunctionCalls(fs.readFileSync(dtsPath, 'utf-8'), 'import').flatMap(({ args }) => args.map(({ value }) => value.toString()))
       list && list.length && (cache = Array.from(new Set(list)))
     }
     const typeDefinition = generateModuleDeclaration(paths, cache)
-    fs.writeFileSync(typesFilePath, typeDefinition)
+    fs.writeFileSync(dtsPath, typeDefinition)
   }
-  generateTypeFile() // 初始化类型定义文件
+  // 只有在需要生成类型文件时才初始化
+  dtsPath && generateTypeFile()
 
   return {
     name: 'async-import-processor',
