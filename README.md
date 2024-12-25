@@ -80,20 +80,20 @@ export default defineConfig({
       // dts文件输出配置，默认为true，即在项目根目录生成类型定义文件
       dts: {
         'enable': true,
-        'base': 'src/types',
+        'base': './',
         // 上面是对类型生成的比较全局的一个配置
         // 下面是对每个类型生成的配置，以下各配置均为可选参数
         'async-import': {
           enable: true,
-          base: 'src/types',
+          base: './',
           name: 'async-import.d.ts',
-          path: 'src/types/async-import.d.ts',
+          path: './async-import.d.ts',
         },
         'async-component': {
           enable: true,
-          base: 'src/types',
+          base: './',
           name: 'async-component.d.ts',
-          path: 'src/types/async-component.d.ts',
+          path: './async-component.d.ts',
         },
       },
     }),
@@ -119,7 +119,7 @@ export default defineConfig({
 
 #### 3. 将插件生成的类型标注文件加入 `tsconfig.json`
 
-插件运行时会在项目根目录下生成 `async-import.d.ts` 与 `async-component.d.ts` 两个类型标注文件，需要将其加入到 `tsconfig.json` 的 `include` 配置项中。
+插件运行时默认会在项目根目录下生成 `async-import.d.ts` 与 `async-component.d.ts` 两个类型标注文件，需要将其加入到 `tsconfig.json` 的 `include` 配置项中；如果有自定义dts生成路径，则根据实际情况填写。
 
 当然，如果原来的配置已经覆盖到了这两个文件，就可以不加；如果没有运行项目的时候，这两个文件不会生成。
 
