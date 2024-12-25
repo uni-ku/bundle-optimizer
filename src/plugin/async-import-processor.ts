@@ -1,13 +1,14 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import type { OutputChunk } from 'rollup'
 import type { Plugin } from 'vite'
+import type { DtsType } from '../type.d'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import MagicString from 'magic-string'
 import { AsyncImports } from '../common/AsyncImports'
 import { JS_TYPES_RE, ROOT_DIR, SRC_DIR_RE } from '../constants'
-import { ensureDirectoryExists, lexFunctionCalls, moduleIdProcessor, parseAsyncImports, resolveAliasPath, resolveAssetsPath } from '../utils'
+import { ensureDirectoryExists, lexFunctionCalls, moduleIdProcessor, normalizePath, parseAsyncImports, resolveAliasPath, resolveAssetsPath } from '../utils'
 
 /**
  * 负责处理`AsyncImport`函数调用的传参路径
@@ -17,7 +18,7 @@ import { ensureDirectoryExists, lexFunctionCalls, moduleIdProcessor, parseAsyncI
  *
  * TODO: 暂时不支持app端：首先由于app端实用的是iife模式，代码内容中无法使用`import()`语法，直接会编译报错
  */
-export function AsyncImportProcessor(): Plugin {
+export function AsyncImportProcessor(options: DtsType): Plugin {
   const platform = process.env.UNI_PLATFORM
   /** 是否小程序 */
   const isMP = platform?.startsWith('mp')
@@ -29,7 +30,10 @@ export function AsyncImportProcessor(): Plugin {
 
   /** 生成类型定义文件 */
   function generateTypeFile(paths?: string[]) {
-    const typesFilePath = path.resolve(ROOT_DIR, 'async-import.d.ts')
+    if (options === false || options.enable === false)
+      return
+
+    const typesFilePath = path.resolve(ROOT_DIR, normalizePath(options.path))
     ensureDirectoryExists(typesFilePath)
     let cache: string[] = [] // 缓存已经生成的类型定义，防止开发阶段热更新时部分类型定义生成丢失
     if (fs.existsSync(typesFilePath)) {

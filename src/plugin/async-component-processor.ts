@@ -1,5 +1,6 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import type { Plugin } from 'vite'
+import type { DtsType } from '../type.d'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
@@ -7,14 +8,14 @@ import { normalizeMiniProgramFilename, removeExt } from '@dcloudio/uni-cli-share
 import MagicString from 'magic-string'
 import { AsyncComponents, type TemplateDescriptor } from '../common/AsyncComponents'
 import { ROOT_DIR } from '../constants'
-import { type ArgumentLocation, calculateRelativePath, ensureDirectoryExists, findFirstNonConsecutiveBefore, kebabCase, lexDefaultImportWithQuery, lexFunctionCalls, resolveAliasPath } from '../utils'
+import { type ArgumentLocation, calculateRelativePath, ensureDirectoryExists, findFirstNonConsecutiveBefore, kebabCase, lexDefaultImportWithQuery, lexFunctionCalls, normalizePath, resolveAliasPath } from '../utils'
 
 /**
  * 处理 `import xxx from "*.vue?async"` 形式的调用
  * @description `transform`阶段处理识别以上形式的导入语句，做相关的缓存处理；并将`?async`查询参数去除，避免后续编译处理识别不来该语句
  * @description `generateBundle`阶段处理生成相关页面的 page-json 文件，注入`componentPlaceholder`配置
  */
-export function AsyncComponentProcessor(): Plugin {
+export function AsyncComponentProcessor(options: DtsType): Plugin {
   const inputDir = process.env.UNI_INPUT_DIR
   const platform = process.env.UNI_PLATFORM
   const AsyncComponentsInstance = new AsyncComponents()
@@ -23,7 +24,10 @@ export function AsyncComponentProcessor(): Plugin {
 
   /** 生成类型定义文件 */
   function generateTypeFile(parseResult?: ReturnType<typeof lexDefaultImportWithQuery>) {
-    const typesFilePath = path.resolve(ROOT_DIR, 'async-component.d.ts')
+    if (options === false || options.enable === false)
+      return
+
+    const typesFilePath = path.resolve(ROOT_DIR, normalizePath(options.path))
     ensureDirectoryExists(typesFilePath)
     let cache: string[] = [] // 缓存已经生成的类型定义，防止开发阶段热更新时部分类型定义生成丢失
     if (fs.existsSync(typesFilePath)) {
