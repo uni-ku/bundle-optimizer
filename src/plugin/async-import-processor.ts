@@ -7,6 +7,7 @@ import path from 'node:path'
 import process from 'node:process'
 import MagicString from 'magic-string'
 import { AsyncImports } from '../common/AsyncImports'
+import { logger } from '../common/Logger'
 import { JS_TYPES_RE, ROOT_DIR, SRC_DIR_RE } from '../constants'
 import { ensureDirectoryExists, lexFunctionCalls, moduleIdProcessor, normalizePath, parseAsyncImports, resolveAliasPath, resolveAssetsPath } from '../utils'
 
@@ -42,8 +43,11 @@ export function AsyncImportProcessor(options: DtsType): Plugin {
     }
     const typeDefinition = generateModuleDeclaration(paths, cache)
     fs.writeFileSync(typesFilePath, typeDefinition)
+    logger.info(`[async-import] ${paths === undefined ? '初始化' : '生成'}类型定义文件 ${typesFilePath.replace(`${ROOT_DIR}\\`, '')}`)
   }
   generateTypeFile() // 初始化类型定义文件
+
+  logger.info('[async-import] 异步导入处理器已启用')
 
   return {
     name: 'async-import-processor',

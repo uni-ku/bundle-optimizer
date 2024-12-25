@@ -7,6 +7,7 @@ import process from 'node:process'
 import { normalizeMiniProgramFilename, removeExt } from '@dcloudio/uni-cli-shared'
 import MagicString from 'magic-string'
 import { AsyncComponents, type TemplateDescriptor } from '../common/AsyncComponents'
+import { logger } from '../common/Logger'
 import { ROOT_DIR } from '../constants'
 import { type ArgumentLocation, calculateRelativePath, ensureDirectoryExists, findFirstNonConsecutiveBefore, kebabCase, lexDefaultImportWithQuery, lexFunctionCalls, normalizePath, resolveAliasPath } from '../utils'
 
@@ -36,8 +37,11 @@ export function AsyncComponentProcessor(options: DtsType): Plugin {
     }
     const typeDefinition = generateModuleDeclaration(parseResult, cache)
     fs.writeFileSync(typesFilePath, typeDefinition)
+    logger.info(`[async-component] ${parseResult === undefined ? '初始化' : '生成'}类型定义文件 ${typesFilePath.replace(`${ROOT_DIR}\\`, '')}`)
   }
   generateTypeFile() // 初始化类型定义文件
+
+  logger.info('[async-component] 异步组件处理器已启用')
 
   return {
     name: 'async-component-processor',

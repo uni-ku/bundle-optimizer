@@ -7,6 +7,7 @@ import type { ISubPkgsInfo } from './type'
 import fs from 'node:fs'
 import path from 'node:path'
 import { parseManifestJsonOnce, parseMiniProgramPagesJson } from '@dcloudio/uni-cli-shared'
+import { logger } from './common/Logger'
 import { PackageModules } from './common/PackageModules'
 import { EXTNAME_JS_RE } from './constants'
 import { moduleIdProcessor as _moduleIdProcessor, normalizePath } from './utils'
@@ -109,15 +110,19 @@ export function UniappSubPackagesOptimization(): Plugin {
   }
   // #endregion
 
+  logger.info('[optimization] 分包优化插件已启用')
+
   return {
     name: 'uniapp-subpackages-optimization',
     enforce: 'post', // 控制执行顺序，post 保证在其他插件之后执行
     config(config, { command }) {
-      if (!platform.startsWith('mp'))
+      if (!platform.startsWith('mp')) {
+        logger.warn('[optimization] 分包优化插件仅需在小程序平台启用，跳过')
         return
+      }
 
       const UNI_OPT_TRACE = process.env.UNI_OPT_TRACE === 'true'
-      console.log('分包优化开启状态:', UNI_OPT_TRACE)
+      logger.info(`[optimization] 分包优化开启状态: ${UNI_OPT_TRACE}`)
       if (!UNI_OPT_TRACE)
         return
 
