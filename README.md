@@ -28,6 +28,33 @@ pnpm add -D @uni-ku/bundle-optimizer
 
 ### 🚀 使用
 
+#### 0. 插件可配置参数
+
+> ！<b style="color: red;">以下各参数均为可选参数</b>，默认在项目根目录下生成`async-import.d.ts`与`async-component.d.ts`文件
+
+|参数-[enable]|类型|默认值|描述|
+|---|---|---|---|
+|enable|`boolean`\|`object`|`true`|插件功能总开关，`object`时可详细配置各插件启闭状态，详见下列|
+|enable.optimization|`boolean`|`true`|分包优化启闭状态|
+|enable['async-import']|`boolean`|`true`|模块异步跨包调用启闭状态|
+|enable['async-component']|`boolean`|`true`|组件异步跨包引用启闭状态|
+
+|参数-[dts]|类型|默认值|描述|
+|---|---|---|---|
+|dts|`boolean`\|`object`|`true`|dts文件输出总配置，`true`时按照下列各配置的默认参数来（根目录下生成`async-import.d.ts`与`async-component.d.ts`文件），`object`时可详细配置各类型文件的生成，详见下列|
+|dts.enable|`boolean`|`true`|总配置，是否生成dts文件|
+|dts.base|`string`|`./`|总配置，dts文件输出目录，可相对路径，也可绝对路径|
+|dts['async-import']|`boolean`\|`object`|`true`|`async-import`dts文件配置，默认为`true`（在项目根目录生成`async-import.d.ts`文件），`object`时可详细配置该项的生成|
+|dts['async-import'].enable|`boolean`|`true`|是否生成dts文件|
+|dts['async-import'].base|`string`|`./`|dts文件输出目录，可相对路径，也可绝对路径|
+|dts['async-import'].name|`string`|`async-import.d.ts`|dts文件名称，需要包含文件后缀|
+|dts['async-import'].path|`string`|`${base}/${name}`|dts文件输出路径，如果没有定义此项则会是`${base}/${name}`，否则此配置项优先级更高，可相对路径，也可绝对路径|
+|dts['async-component']|`boolean`\|`object`|`true`|`async-component`dts文件配置，默认为`true`（在项目根目录生成`async-component.d.ts`文件），`object`时可详细配置该项的生成|
+|dts['async-component'].enable|`boolean`|`true`|是否生成dts文件|
+|dts['async-component'].base|`string`|`./`|dts文件输出目录，可相对路径，也可绝对路径|
+|dts['async-component'].name|`string`|`async-component.d.ts`|dts文件名称，需要包含文件后缀|
+|dts['async-component'].path|`string`|`${base}/${name}`|dts文件输出路径，如果没有定义此项则会是`${base}/${name}`，否则此配置项优先级更高，可相对路径，也可绝对路径|
+
 #### 1. 引入 `@uni-ku/bundle-optimizer`
 
 - CLI: `直接编写` 根目录下的 vite.config.*
