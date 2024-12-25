@@ -24,6 +24,6 @@
     "toml"
   ],
   "yaml.schemas": {
-    "schema\\commitlint.json": ".commitlintrc.yaml"
+    "schema\\commitlint-with-cz.json": ".commitlintrc.yaml"
   }
 }
