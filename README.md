@@ -30,7 +30,7 @@ pnpm add -D @uni-ku/bundle-optimizer
 
 #### 0. 插件可配置参数
 
-> ！<b style="color: red;">以下各参数均为可选参数</b>，默认在项目根目录下生成`async-import.d.ts`与`async-component.d.ts`文件
+> ！<b style="color: red;">以下各参数均为可选参数</b>，默认开启所有插件功能，并在项目根目录下生成`async-import.d.ts`与`async-component.d.ts`文件
 
 |参数-[enable]|类型|默认值|描述|
 |---|---|---|---|
