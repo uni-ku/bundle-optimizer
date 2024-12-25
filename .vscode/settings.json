@@ -22,5 +22,8 @@
     "yml",
     "markdown",
     "toml"
-  ]
+  ],
+  "yaml.schemas": {
+    "schema\\commitlint.json": ".commitlintrc.yaml"
+  }
 }

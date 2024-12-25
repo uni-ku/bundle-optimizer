@@ -45,7 +45,7 @@
     "release": "npm run build && bumpp",
     "prepublishOnly": "npm run build",
     "prepare": "simple-git-hooks && npm run build",
-    "lint": "eslint . --fix",
+    "lint": "eslint . --fix --flag unstable_ts_config",
     "commit": "git-cz",
     "example:dev:h5": "npm -C examples run dev",
     "example:build:h5": "npm -C examples run build",
@@ -86,7 +86,7 @@
   },
   "lint-staged": {
     "*.{js,ts,tsx,vue,md}": [
-      "eslint . --fix"
+      "eslint . --fix --flag unstable_ts_config"
     ]
   },
   "config": {
