@@ -60,7 +60,6 @@
   "dependencies": {
     "@dcloudio/uni-cli-shared": "3.0.0-4020820240925001",
     "@node-rs/xxhash": "^1.7.6",
-    "chalk": "^5.4.1",
     "magic-string": "^0.30.17",
     "minimatch": "^10.0.1",
     "typescript": "^5.5.0"
@@ -71,6 +70,7 @@
     "@commitlint/config-conventional": "^19.2.2",
     "@types/node": "^22.10.2",
     "bumpp": "^9.9.1",
+    "chalk": "^4.1.2",
     "commitizen": "^4.3.0",
     "cz-git": "^1.9.1",
     "eslint": "^9.17.0",
