@@ -55,6 +55,10 @@ pnpm add -D @uni-ku/bundle-optimizer
 |dts['async-component'].name|`string`|`async-component.d.ts`|dts文件名称，需要包含文件后缀|
 |dts['async-component'].path|`string`|`${base}/${name}`|dts文件输出路径，如果没有定义此项则会是`${base}/${name}`，否则此配置项优先级更高，可相对路径，也可绝对路径|
 
+|参数-[logger]|类型|默认值|描述|
+|---|---|---|---|
+|logger|`boolean`\|`string[]`|`false`|插件日志输出总配置，`true`时启用所有子插件的日志功能；`string[]`时可具体启用部分插件的日志，可以是`optimization`、`async-component`、`async-import`|
+
 #### 1. 引入 `@uni-ku/bundle-optimizer`
 
 - CLI: `直接编写` 根目录下的 vite.config.*
@@ -96,6 +100,8 @@ export default defineConfig({
           path: './async-component.d.ts',
         },
       },
+      // 也可以传递具体的子插件的字符串列表，如 ['optimization', 'async-import', 'async-component']，开启部分插件的log功能
+      logger: true,
     }),
   ],
 })
