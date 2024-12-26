@@ -15,7 +15,7 @@ import { moduleIdProcessor as _moduleIdProcessor, normalizePath } from './utils'
 /**
  * uniapp 分包优化插件
  */
-export function UniappSubPackagesOptimization(): Plugin {
+export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
   const platform = process.env.UNI_PLATFORM
   const inputDir = process.env.UNI_INPUT_DIR
 
@@ -110,19 +110,19 @@ export function UniappSubPackagesOptimization(): Plugin {
   }
   // #endregion
 
-  logger.info('[optimization] 分包优化插件已启用')
+  logger.info('[optimization] 分包优化插件已启用', !enableLogger)
 
   return {
     name: 'uniapp-subpackages-optimization',
     enforce: 'post', // 控制执行顺序，post 保证在其他插件之后执行
     config(config, { command }) {
       if (!platform.startsWith('mp')) {
-        logger.warn('[optimization] 分包优化插件仅需在小程序平台启用，跳过')
+        logger.warn('[optimization] 分包优化插件仅需在小程序平台启用，跳过', !enableLogger)
         return
       }
 
       const UNI_OPT_TRACE = process.env.UNI_OPT_TRACE === 'true'
-      logger.info(`[optimization] 分包优化开启状态: ${UNI_OPT_TRACE}`)
+      logger.info(`[optimization] 分包优化开启状态: ${UNI_OPT_TRACE}`, !true) // !!! 此处始终开启log
       if (!UNI_OPT_TRACE)
         return
 

@@ -10,11 +10,11 @@ export default (options: IOptions = {}): PluginOption => {
 
   return [
     // 分包优化
-    parse.enable.optimization && UniappSubPackagesOptimization(),
+    parse.enable.optimization && UniappSubPackagesOptimization(parse.logger.optimization),
     // js/ts插件的异步调用
-    parse.enable['async-import'] && AsyncImport(parse.dts['async-import']),
+    parse.enable['async-import'] && AsyncImport(parse.dts['async-import'], parse.logger['async-import']),
     // vue组件的异步调用
-    parse.enable['async-component'] && AsyncComponent(parse.dts['async-component']),
+    parse.enable['async-component'] && AsyncComponent(parse.dts['async-component'], parse.logger['async-component']),
   ]
 }
 

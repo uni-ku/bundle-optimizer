@@ -11,17 +11,29 @@ enum LogLevel {
 export class Logger {
   private level: LogLevel
   private context: string
+  /** TODO: 可以使用其他的 debug 日志库 */
+  private Debugger = null
+  /** 全局兜底：是否是隐式log */
+  private isImplicit: boolean
 
-  constructor(level: LogLevel = LogLevel.INFO, context: string = 'Plugin') {
+  constructor(level: LogLevel = LogLevel.INFO, context: string = 'Plugin', isImplicit = false) {
     this.level = level
     this.context = context
+    this.isImplicit = isImplicit
   }
 
-  private log(level: LogLevel, message: string) {
+  private log(level: LogLevel, message: string, isImplicit?: boolean) {
     if (this.shouldLog(level)) {
-      const timestamp = new Date().toISOString()
       const coloredMessage = this.getColoredMessage(level, message)
-      console.log(`[${timestamp}] ${coloredMessage}`)
+      if (isImplicit ?? this.isImplicit) {
+        // TODO: 相关的隐式log，需要通过外部环境变量启用
+        // 此处暂时不显示
+      }
+      else {
+        const c = 69
+        const colorCode = `\u001B[3${c < 8 ? c : `8;5;${c}`};1m`
+        console.log(`  ${chalk(`${colorCode}${this.context}`)} ${coloredMessage}`)
+      }
     }
   }
 
@@ -33,32 +45,32 @@ export class Logger {
   private getColoredMessage(level: LogLevel, message: string): string {
     switch (level) {
       case LogLevel.DEBUG:
-        return chalk.blue(`[${level}] [${this.context}] ${message}`)
+        return chalk.blue(`[${level}] ${message}`)
       case LogLevel.INFO:
-        return chalk.green(`[${level}] [${this.context}] ${message}`)
+        return chalk.green(`[${level}] ${message}`)
       case LogLevel.WARN:
-        return chalk.yellow(`[${level}] [${this.context}] ${message}`)
+        return chalk.yellow(`[${level}] ${message}`)
       case LogLevel.ERROR:
-        return chalk.red(`[${level}] [${this.context}] ${message}`)
+        return chalk.red(`[${level}] ${message}`)
       default:
         return message
     }
   }
 
-  debug(message: string) {
-    this.log(LogLevel.DEBUG, message)
+  debug(message: string, isImplicit?: boolean) {
+    this.log(LogLevel.DEBUG, message, isImplicit)
   }
 
-  info(message: string) {
-    this.log(LogLevel.INFO, message)
+  info(message: string, isImplicit?: boolean) {
+    this.log(LogLevel.INFO, message, isImplicit)
   }
 
-  warn(message: string) {
-    this.log(LogLevel.WARN, message)
+  warn(message: string, isImplicit?: boolean) {
+    this.log(LogLevel.WARN, message, isImplicit)
   }
 
-  error(message: string) {
-    this.log(LogLevel.ERROR, message)
+  error(message: string, isImplicit?: boolean) {
+    this.log(LogLevel.ERROR, message, isImplicit)
   }
 }
 

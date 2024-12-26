@@ -16,7 +16,7 @@ import { type ArgumentLocation, calculateRelativePath, ensureDirectoryExists, fi
  * @description `transform`阶段处理识别以上形式的导入语句，做相关的缓存处理；并将`?async`查询参数去除，避免后续编译处理识别不来该语句
  * @description `generateBundle`阶段处理生成相关页面的 page-json 文件，注入`componentPlaceholder`配置
  */
-export function AsyncComponentProcessor(options: DtsType): Plugin {
+export function AsyncComponentProcessor(options: DtsType, enableLogger: boolean): Plugin {
   const inputDir = process.env.UNI_INPUT_DIR
   const platform = process.env.UNI_PLATFORM
   const AsyncComponentsInstance = new AsyncComponents()
@@ -37,11 +37,11 @@ export function AsyncComponentProcessor(options: DtsType): Plugin {
     }
     const typeDefinition = generateModuleDeclaration(parseResult, cache)
     fs.writeFileSync(typesFilePath, typeDefinition)
-    logger.info(`[async-component] ${parseResult === undefined ? '初始化' : '生成'}类型定义文件 ${typesFilePath.replace(`${ROOT_DIR}\\`, '')}`)
+    logger.info(`[async-component] ${parseResult === undefined ? '初始化' : '生成'}类型定义文件 ${typesFilePath.replace(`${ROOT_DIR}\\`, '')}`, !enableLogger)
   }
   generateTypeFile() // 初始化类型定义文件
 
-  logger.info('[async-component] 异步组件处理器已启用')
+  logger.info('[async-component] 异步组件处理器已启用', !enableLogger)
 
   return {
     name: 'async-component-processor',

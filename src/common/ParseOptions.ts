@@ -1,4 +1,4 @@
-import type { IDtsOptions, IOptions } from '../type.d'
+import type { Enable, IDtsOptions, IOptions } from '../type.d'
 import { normalizePath } from '../utils'
 
 export class ParseOptions {
@@ -46,5 +46,15 @@ export class ParseOptions {
 
     const path = typeof params === 'boolean' ? `${normalizePath(base).replace(/\/$/, '')}/${name}` : params.enable !== false && normalizePath(params.path || `${normalizePath(params.base ?? base).replace(/\/$/, '')}/${params.name ?? name}`)
     return path !== false && { enable: true, path }
+  }
+
+  get logger() {
+    const { logger: origin = false } = this.options
+    const _ = ['optimization', 'async-component', 'async-import']
+    const temp = typeof origin === 'boolean'
+      ? origin ? _ : false
+      : origin
+
+    return Object.fromEntries(_.map(item => [item, (temp || []).includes(item)])) as Record<Enable, boolean>
   }
 }

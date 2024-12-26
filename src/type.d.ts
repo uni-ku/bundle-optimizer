@@ -54,4 +54,8 @@ export interface IOptions {
    * @description 默认为true，即在项目根目录生成类型定义文件
    */
   dts?: Partial<Omit<IDtsOptions, 'name' | 'path'> & Record<Exclude<Enable, 'optimization'>, IDtsOptions | boolean>> | boolean
+  /**
+   * log 控制，默认不启用，为false
+   */
+  logger?: boolean | Enable[]
 }

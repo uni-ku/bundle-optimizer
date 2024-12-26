@@ -121,5 +121,10 @@ export function findFirstNonConsecutiveBefore(arr: number[]): number | null {
   return (result !== undefined && result !== null) ? arr[arr.indexOf(result) - 1] : null
 }
 
+/** 明确的 bool 型做取反，空值原样返回 */
+export function toggleBoolean(value: boolean | undefined | null) {
+  return typeof value === 'boolean' ? !value : value
+}
+
 export * from './getTsConfigPaths'
 export * from './lex-parse'

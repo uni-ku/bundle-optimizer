@@ -1,8 +1,8 @@
 import { AsyncComponentProcessor } from './plugin/async-component-processor'
 
-export default (options: Parameters<typeof AsyncComponentProcessor>[0]) => {
+export default (...options: Parameters<typeof AsyncComponentProcessor>) => {
   return [
     // 处理 `.vue?async` 查询参数的静态导入
-    AsyncComponentProcessor(options),
+    AsyncComponentProcessor(...options),
   ]
 }

@@ -19,7 +19,7 @@ import { ensureDirectoryExists, lexFunctionCalls, moduleIdProcessor, normalizePa
  *
  * TODO: 暂时不支持app端：首先由于app端实用的是iife模式，代码内容中无法使用`import()`语法，直接会编译报错
  */
-export function AsyncImportProcessor(options: DtsType): Plugin {
+export function AsyncImportProcessor(options: DtsType, enableLogger: boolean): Plugin {
   const platform = process.env.UNI_PLATFORM
   /** 是否小程序 */
   const isMP = platform?.startsWith('mp')
@@ -43,11 +43,11 @@ export function AsyncImportProcessor(options: DtsType): Plugin {
     }
     const typeDefinition = generateModuleDeclaration(paths, cache)
     fs.writeFileSync(typesFilePath, typeDefinition)
-    logger.info(`[async-import] ${paths === undefined ? '初始化' : '生成'}类型定义文件 ${typesFilePath.replace(`${ROOT_DIR}\\`, '')}`)
+    logger.info(`[async-import] ${paths === undefined ? '初始化' : '生成'}类型定义文件 ${typesFilePath.replace(`${ROOT_DIR}\\`, '')}`, !enableLogger)
   }
   generateTypeFile() // 初始化类型定义文件
 
-  logger.info('[async-import] 异步导入处理器已启用')
+  logger.info('[async-import] 异步导入处理器已启用', !enableLogger)
 
   return {
     name: 'async-import-processor',
