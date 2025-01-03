@@ -73,6 +73,9 @@ export function moduleIdProcessor(id: string, rootDir = ROOT_DIR) {
  */
 export function calculateRelativePath(importer: string, imported: string): string {
   // 获取相对路径
+  if (imported.match(/^(\.\/|\.\.\/)+/)) {
+    imported = path.resolve(path.dirname(importer), imported)
+  }
   const relativePath = path.relative(path.dirname(importer), imported)
 
   // 将路径中的反斜杠替换为正斜杠（适用于 Windows 系统）
