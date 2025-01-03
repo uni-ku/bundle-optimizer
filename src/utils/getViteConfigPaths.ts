@@ -1,6 +1,7 @@
 import type { Alias, UserConfig } from 'vite'
 import path from 'node:path'
 import { isRegExp } from 'node:util/types'
+import { normalizePath } from '.'
 
 /**
 /**
@@ -19,9 +20,14 @@ export function createVitePathResolver(config: UserConfig) {
   }
 
   return (source: string, relative = false) => {
-    for (const { find, replacement, customResolver: _customResolver } of alias) {
+    for (let { find, replacement, customResolver: _customResolver } of alias) {
       if (!find || !replacement)
         continue
+
+      source = normalizePath(source)
+      if (typeof replacement === 'string' && !isRegExp(replacement) && !replacement.includes('*')) {
+        replacement = normalizePath(replacement)
+      }
 
       if (!isRegExp(replacement) && !isRegExp(find) && !find.includes('*')) {
         // 断定为全量匹配
@@ -29,7 +35,7 @@ export function createVitePathResolver(config: UserConfig) {
           return relative ? replacement : path.resolve(replacement)
         }
       }
-      else if (source.match(find) && (isRegExp(find) || !find.includes('*'))) {
+      if (source.match(find) && (isRegExp(find) || !find.includes('*'))) {
         const realPath = source.replace(find, replacement)
         return relative ? realPath : path.resolve(realPath)
       }
