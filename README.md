@@ -224,6 +224,19 @@ import AsyncComponent from 'xxxxx.vue?async'
 |[Uni Ku](https://github.com/uni-ku)|有很多 Uniapp(Uni) 的酷(Ku) 😎|
 |[Wot Design Uni](https://github.com/Moonofweisheng/wot-design-uni/)|一个基于Vue3+TS开发的uni-app组件库，提供70+高质量组件|
 
+### 🧔 找到我
+
+> 加我微信私聊，方便定位、解决问题。
+
+<table style="width: 100%; text-align: center;">
+  <tr>
+    <td>
+      <img src="https://fastly.jsdelivr.net/gh/Vanisper/static@main/connect/weixin-qrcode.png" alt="wechat-qrcode" height="360" />
+      <p align="center">微信</p>
+    </td>
+  </tr>
+</table>
+
 ### 💖 赞赏
 
 如果我的工作帮助到了您，可以请我吃辣条，使我能量满满 ⚡
@@ -252,17 +265,6 @@ import AsyncComponent from 'xxxxx.vue?async'
     <img alt="sponsors" src="https://fastly.jsdelivr.net/gh/Vanisper/sponsors@main/sponsors.svg"/>
   </a>
 </p>
-
-### 🧔 找到我
-
-<table style="width: 100%; text-align: center;">
-  <tr>
-    <td>
-      <img src="https://fastly.jsdelivr.net/gh/Vanisper/static@main/connect/weixin-qrcode.png" alt="wechat-qrcode" height="360" />
-      <p align="center">微信</p>
-    </td>
-  </tr>
-</table>
 
 ---
 
