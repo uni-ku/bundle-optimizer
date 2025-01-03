@@ -253,6 +253,17 @@ import AsyncComponent from 'xxxxx.vue?async'
   </a>
 </p>
 
+### 🧔 找到我
+
+<table style="width: 100%; text-align: center;">
+  <tr>
+    <td>
+      <img src="https://fastly.jsdelivr.net/gh/Vanisper/static@main/connect/weixin-qrcode.png" alt="wechat-qrcode" height="360" />
+      <p align="center">微信</p>
+    </td>
+  </tr>
+</table>
+
 ---
 
 <p align="center">
