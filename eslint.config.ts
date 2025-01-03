@@ -2,6 +2,6 @@ import antfu from '@antfu/eslint-config'
 
 export default antfu({
   ignores: [
-    'examples/hbx-vue3',
+    'examples/hbx+vue3',
   ],
 })
