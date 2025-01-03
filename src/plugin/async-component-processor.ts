@@ -9,7 +9,7 @@ import MagicString from 'magic-string'
 import { AsyncComponents, type TemplateDescriptor } from '../common/AsyncComponents'
 import { logger } from '../common/Logger'
 import { ROOT_DIR } from '../constants'
-import { type ArgumentLocation, calculateRelativePath, ensureDirectoryExists, findFirstNonConsecutiveBefore, kebabCase, lexDefaultImportWithQuery, lexFunctionCalls, normalizePath, resolveAliasPath } from '../utils'
+import { type ArgumentLocation, calculateRelativePath, ensureDirectoryExists, findFirstNonConsecutiveBefore, getVitePathResolver, kebabCase, lexDefaultImportWithQuery, lexFunctionCalls, normalizePath } from '../utils'
 
 /**
  * 处理 `import xxx from "*.vue?async"` 形式的调用
@@ -79,7 +79,7 @@ export function AsyncComponentProcessor(options: DtsType, enableLogger: boolean)
             // ---- 记录异步组件 [小程序环境下] ----
             if (isMP) {
               const url = modulePath.value.toString()
-              let normalizedPath = resolveAliasPath(url, true)
+              let normalizedPath = getVitePathResolver()(url, true)
               // 根据调用主从关系，获取引用文件的相对路径
               normalizedPath = calculateRelativePath(importer, normalizedPath)
               // 去除 .vue 后缀

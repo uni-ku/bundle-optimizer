@@ -130,4 +130,5 @@ export function toggleBoolean(value: boolean | undefined | null) {
 }
 
 export * from './getTsConfigPaths'
+export * from './getViteConfigPaths'
 export * from './lex-parse'

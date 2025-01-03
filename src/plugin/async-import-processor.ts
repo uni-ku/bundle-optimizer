@@ -9,7 +9,7 @@ import MagicString from 'magic-string'
 import { AsyncImports } from '../common/AsyncImports'
 import { logger } from '../common/Logger'
 import { JS_TYPES_RE, ROOT_DIR, SRC_DIR_RE } from '../constants'
-import { ensureDirectoryExists, lexFunctionCalls, moduleIdProcessor, normalizePath, parseAsyncImports, resolveAliasPath, resolveAssetsPath } from '../utils'
+import { ensureDirectoryExists, getVitePathResolver, lexFunctionCalls, moduleIdProcessor, normalizePath, parseAsyncImports, resolveAssetsPath } from '../utils'
 
 /**
  * 负责处理`AsyncImport`函数调用的传参路径
@@ -82,7 +82,7 @@ export function AsyncImportProcessor(options: DtsType, enableLogger: boolean): P
       if (cache && options.targetModuleId && !isApp && !isH5) {
         // 如果是js文件的话去掉后缀
         const targetModuleId = moduleIdProcessor(options.targetModuleId).replace(JS_TYPES_RE, '')
-        if (cache.map(item => (item.match(/^(\.\/|\.\.\/)+/) ? path.resolve(path.dirname(options.moduleId), item) : resolveAliasPath(item).replace(SRC_DIR_RE, 'src/')))
+        if (cache.map(item => (item.match(/^(\.\/|\.\.\/)+/) ? path.resolve(path.dirname(options.moduleId), item) : getVitePathResolver()(item).replace(SRC_DIR_RE, 'src/')))
           .some(item => moduleIdProcessor(item).replace(JS_TYPES_RE, '') === targetModuleId)
         ) {
           return {
