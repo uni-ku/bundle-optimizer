@@ -82,7 +82,7 @@ export function AsyncImportProcessor(options: DtsType, enableLogger: boolean): P
       if (cache && options.targetModuleId && !isApp && !isH5) {
         // 如果是js文件的话去掉后缀
         const targetModuleId = moduleIdProcessor(options.targetModuleId).replace(JS_TYPES_RE, '')
-        if (cache.map(item => resolveAliasPath(item, true).replace(SRC_DIR_RE, 'src/'))
+        if (cache.map(item => (item.match(/^(\.\/|\.\.\/)+/) ? path.resolve(path.dirname(options.moduleId), item) : resolveAliasPath(item).replace(SRC_DIR_RE, 'src/')))
           .some(item => moduleIdProcessor(item).replace(JS_TYPES_RE, '') === targetModuleId)
         ) {
           return {
