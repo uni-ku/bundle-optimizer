@@ -36,7 +36,7 @@ jobs:
         run: pnpm run build
 
       - name: Build Project
-        run: pnpm run example:build:h5
+        run: pnpm run example1:build:h5
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
