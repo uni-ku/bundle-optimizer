@@ -42,4 +42,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./examples/dist/build/h5 # 构建输出目录
+          publish_dir: ./examples/vue3+vite+ts/dist/build/h5 # 构建输出目录
