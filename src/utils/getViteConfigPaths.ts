@@ -29,13 +29,19 @@ export function createVitePathResolver(config: UserConfig) {
         replacement = normalizePath(replacement)
       }
 
-      if (!isRegExp(replacement) && !isRegExp(find) && !find.includes('*')) {
-        // 断定为全量匹配
+      if (!isRegExp(replacement) && typeof replacement === 'string' && !replacement.includes('*')
+        && !isRegExp(find) && typeof find === 'string' && !find.includes('*')) {
         if (source === find) {
+          // 断定为全量匹配
           return relative ? replacement : path.resolve(replacement)
         }
+        else if (source.startsWith(find)) {
+          // 断定为前缀匹配
+          const realPath = source.replace(find, replacement)
+          return relative ? realPath : path.resolve(realPath)
+        }
       }
-      if (source.match(find) && (isRegExp(find) || !find.includes('*'))) {
+      else if (source.match(find) && (isRegExp(find) || !find.includes('*'))) {
         const realPath = source.replace(find, replacement)
         return relative ? realPath : path.resolve(realPath)
       }
