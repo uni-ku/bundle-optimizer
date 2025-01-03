@@ -47,10 +47,10 @@
     "prepare": "simple-git-hooks && npm run build",
     "lint": "eslint . --fix --flag unstable_ts_config",
     "commit": "git-cz",
-    "example:dev:h5": "npm -C examples run dev",
-    "example:build:h5": "npm -C examples run build",
-    "example:dev:mp-weixin": "npm -C examples run dev:mp-weixin",
-    "example:build:mp-weixin": "npm -C examples run build:mp-weixin"
+    "example1:dev:h5": "npm -C examples/vue3+vite+ts run dev",
+    "example1:build:h5": "npm -C examples/vue3+vite+ts run build",
+    "example1:dev:mp-weixin": "npm -C examples/vue3+vite+ts run dev:mp-weixin",
+    "example1:build:mp-weixin": "npm -C examples/vue3+vite+ts run build:mp-weixin"
   },
   "peerDependencies": {
     "rollup": ">=4.0.0",

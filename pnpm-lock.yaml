@@ -67,7 +67,7 @@ importers:
         specifier: ^5.0.0
         version: 5.4.11(@types/node@22.10.2)(terser@5.37.0)
 
-  examples:
+  examples/vue3+vite+ts:
     dependencies:
       '@dcloudio/uni-app':
         specifier: 3.0.0-4020820240925001
@@ -105,7 +105,7 @@ importers:
         version: 4.17.13
       '@uni-ku/bundle-optimizer':
         specifier: workspace:*
-        version: link:..
+        version: link:../..
 
 packages:
 
