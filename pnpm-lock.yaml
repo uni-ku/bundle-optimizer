@@ -67,6 +67,16 @@ importers:
         specifier: ^5.0.0
         version: 5.4.11(@types/node@22.10.2)(terser@5.37.0)
 
+  examples/hbx-vue3:
+    dependencies:
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+    devDependencies:
+      '@uni-ku/bundle-optimizer':
+        specifier: workspace:*
+        version: link:../..
+
   examples/vue3+vite+ts:
     dependencies:
       '@dcloudio/uni-app':
