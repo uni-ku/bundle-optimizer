@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import SubComponent from '@/pages-sub-async/component.vue?async'
 import SubDemo from '@/pages-sub-demo/index.vue?async'
+import { onMounted } from 'vue'
+import { getMainPackageTestApi } from "@/api";
 
 function goDemoSubPage() {
   uni.navigateTo({
     url: '/pages-sub-demo/index',
   })
 }
+
+onMounted(async () => {
+  getMainPackageTestApi("主包 api 请求模拟")
+})
 </script>
 
 <template>

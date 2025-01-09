@@ -2,6 +2,7 @@
 <script lang="ts" setup>
 import SubComponent from '@/pages-sub-async/component.vue?async'
 import { onMounted } from 'vue'
+import { getSubPackageTestApi } from './api';
 
 function goSubPage() {
   uni.navigateTo({
@@ -9,10 +10,11 @@ function goSubPage() {
   })
 }
 
-onMounted(() => {
+onMounted(async () => {
   AsyncImport('@/pages-sub-async/plugin').then((res) => {
     res.AsyncPluginDemo().run()
   })
+  getSubPackageTestApi("子包 api 请求模拟")
 })
 </script>
 

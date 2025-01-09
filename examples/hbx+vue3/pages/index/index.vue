@@ -10,6 +10,7 @@
 </template>
 
 <script>
+	import { getMainPackageTestApi } from "@/api";
 	import SubPageAsync from "@/pages-sub/index/index.vue?async"
 	export default {
 		components: {
@@ -21,12 +22,13 @@
 			}
 		},
 		onLoad() {
+			getMainPackageTestApi("主包 api 请求模拟");
 			AsyncImport("../../pages-sub/index/index.vue").then((res) => {
 				console.log(111, res)
-			})
+			});
 			AsyncImport("@/pages-sub/plugins/index").then((res) => {
 				res?.default?.test(222)
-			})
+			});
 		},
 		methods: {
 			goSub() {

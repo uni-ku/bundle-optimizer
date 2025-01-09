@@ -6,6 +6,7 @@
 
 <script>
 	import lodash from "lodash"
+	import { getSubPackageTestApi } from '../api';
 	
 	export default {
 		data() {
@@ -20,6 +21,7 @@
 			
 		},
 		mounted() {
+			getSubPackageTestApi("子包 api 请求模拟");
 			console.log(lodash.groupBy(this.list, "name"));
 		}
 	}
