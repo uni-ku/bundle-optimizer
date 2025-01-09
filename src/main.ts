@@ -173,7 +173,8 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
             }
             else {
               const result = PackageModulesInstance.processModule(moduleInfo)
-              if (result?.[0]) {
+              // 排除掉含有非子包引用，且不是`node_modules`下的模块，这说明这个模块是主包的模块
+              if (result?.[0] && !(hasNoSubPackage(importers) && !hasNodeModules(importers))) {
                 return `${result[0]}common/vendor`
               }
             }
