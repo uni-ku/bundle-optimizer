@@ -148,7 +148,9 @@ export default defineConfig({
 
 ### ✨ 例子
 
-> 以下例子均以CLI创建项目为例, HBuilderX 项目与以上设置同理, 只要注意是否需要包含 src目录 即可。
+> 以下例子均以CLI创建项目为例, HBuilderX 项目与以上设置同理 ~~, 只要注意是否需要包含 src目录 即可~~。
+>
+> 现在已经支持 hbx 创建的 vue3 + vite、不以 src 为主要代码目录的项目。
 
  🔗 [查看以下例子的完整项目](./examples)
 
