@@ -87,7 +87,7 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
           const name = moduleIdProcessor(m.id)
           // 判断是否为组件
           if (name.includes('.vue') || name.includes('.nvue')) {
-          // 判断存在跨包引用的情况(该组件的引用路径不包含子包路径，就说明跨包引用了)
+            // 判断存在跨包引用的情况(该组件的引用路径不包含子包路径，就说明跨包引用了)
             if (subPackageRoot && !name.includes(subPackageRoot)) {
               if (process.env.UNI_OPT_TRACE) {
                 console.log('move module to main chunk:', moduleInfo.id, 'from', subPackageRoot, 'for component in main package:', name)
@@ -129,7 +129,7 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
       const originalOutput = config?.build?.rollupOptions?.output
 
       const existingManualChunks
-      = (Array.isArray(originalOutput) ? originalOutput[0]?.manualChunks : originalOutput?.manualChunks) as GetManualChunk
+        = (Array.isArray(originalOutput) ? originalOutput[0]?.manualChunks : originalOutput?.manualChunks) as GetManualChunk
 
       // 合并已有的 manualChunks 配置
       const mergedManualChunks: GetManualChunk = (id, meta) => {
@@ -177,6 +177,39 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
               if (result?.[0] && !(hasNoSubPackage(importers) && !hasNodeModules(importers))) {
                 return `${result[0]}common/vendor`
               }
+
+              // #region 判断是否只被子包和 node_modules 的包引用
+              // 排除子包和node_modules的importers | 剩下的都是主包的模块
+              const mainPackageImporters = importers.filter((item) => {
+                return !subPackageRoots.some(root => moduleIdProcessor(item).indexOf(root) === 0) && !moduleIdProcessor(item).includes('node_modules')
+              })
+              if ((!mainPackageImporters || !mainPackageImporters.length) && subPackageRoot && hasNodeModules(importers)) {
+                const nodeModulesInfo = importers.filter(item => item.includes('node_modules')).map(item => meta.getModuleInfo(item))
+                for (let index = 0; index < nodeModulesInfo.length; index++) {
+                  const info = nodeModulesInfo[index]
+                  if (info?.importers) {
+                    const matchSubPackages = findSubPackages(info.importers)
+                    let _subPackageRoot: string | undefined = matchSubPackages.values().next().value
+                    const matchSubpackageModules = PackageModulesInstance.findModuleInImporters(importers) || {}
+                    const matchSubpackage = Object.keys(matchSubpackageModules)[0] // 当前仅支持一个子包引用
+
+                    if (((matchSubPackages.size === 1 && !hasNoSubPackage(info.importers))
+                      || (matchSubpackage && hasNodeModules(info.importers)
+                      ))
+                      && !hasMainPackageComponent(info, _subPackageRoot)) {
+                      if (!_subPackageRoot) {
+                        _subPackageRoot = matchSubpackage
+                      }
+
+                      if (_subPackageRoot === subPackageRoot) {
+                        PackageModulesInstance.addModuleRecord(_subPackageRoot, moduleInfo) // 模块引入子包记录，用于链式依赖的索引
+                        return `${_subPackageRoot}common/vendor`
+                      }
+                    }
+                  }
+                }
+              }
+              // #endregion
             }
           }
         }
