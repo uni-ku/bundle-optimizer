@@ -61,7 +61,7 @@
     "@dcloudio/uni-cli-shared": "3.0.0-4020820240925001",
     "@node-rs/xxhash": "^1.7.6",
     "magic-string": "^0.30.17",
-    "minimatch": "^10.0.1",
+    "minimatch": "^9.0.5",
     "typescript": "^5.5.0"
   },
   "devDependencies": {
