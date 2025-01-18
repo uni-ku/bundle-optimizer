@@ -20,9 +20,6 @@ importers:
       minimatch:
         specifier: ^9.0.5
         version: 9.0.5
-      typescript:
-        specifier: ^5.5.0
-        version: 5.7.2
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^3.12.0
