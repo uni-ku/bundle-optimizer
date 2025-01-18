@@ -224,6 +224,7 @@ import AsyncComponent from 'xxxxx.vue?async'
 |项目|描述|
 |---|---|
 |[Uni Ku](https://github.com/uni-ku)|有很多 Uniapp(Uni) 的酷(Ku) 😎|
+|[create-uni](https://uni-helper.js.org/create-uni)|🛠️ 快速创建uni-app项目|
 |[Wot Design Uni](https://github.com/Moonofweisheng/wot-design-uni/)|一个基于Vue3+TS开发的uni-app组件库，提供70+高质量组件|
 
 ### 🧔 找到我
