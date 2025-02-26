@@ -1,5 +1,9 @@
 import type { BuildOptions, IndexHtmlTransformContext, ModuleNode, splitVendorChunk } from 'vite'
 
+export type Prettify<T> = {
+  [K in keyof T]: T[K]
+} & {}
+
 // #region Rollup 相关类型定义获取
 type ExtractOutputOptions<T> = T extends (infer U)[] ? U : T extends undefined ? never : T
 export type OutputOptions = ExtractOutputOptions<Exclude<BuildOptions['rollupOptions'], undefined>['output']>
@@ -63,15 +67,15 @@ export interface IOptions {
    *
    * @description 默认为true，即开启所有功能
    */
-  enable?: boolean | Partial<Record<Enable, boolean>>
+  enable?: boolean | Prettify<Partial<Record<Enable, boolean>>>
   /**
    * dts文件输出配置（可选）
    *
    * @description 默认为true，即在项目根目录生成类型定义文件
    */
-  dts?: Partial<Omit<IDtsOptions, 'name' | 'path'> & Record<Exclude<Enable, 'optimization'>, IDtsOptions | boolean>> | boolean
+  dts?: Prettify<Partial<Omit<IDtsOptions, 'name' | 'path'> & Record<Exclude<Enable, 'optimization'>, IDtsOptions | boolean>>> | boolean
   /**
    * log 控制，默认不启用，为false
    */
-  logger?: boolean | Enable[]
+  logger?: Prettify<boolean | Enable[]>
 }
