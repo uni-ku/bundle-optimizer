@@ -1,5 +1,5 @@
 import type { PluginOption } from 'vite'
-import type { IOptions } from './type.d'
+import type { IOptions } from './type'
 import AsyncComponent from './async-component'
 import AsyncImport from './async-import'
 import { ParseOptions } from './common/ParseOptions'
@@ -25,4 +25,4 @@ export default (options: IOptions = {}): PluginOption => {
   ]
 }
 
-export * from './type.d'
+export type * from './type'
