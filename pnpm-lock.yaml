@@ -14,6 +14,9 @@ importers:
       '@node-rs/xxhash':
         specifier: ^1.7.6
         version: 1.7.6
+      chalk:
+        specifier: ^5.4.1
+        version: 5.4.1
       magic-string:
         specifier: ^0.30.17
         version: 0.30.17
@@ -36,9 +39,6 @@ importers:
       bumpp:
         specifier: ^9.9.1
         version: 9.11.1
-      chalk:
-        specifier: ^4.1.2
-        version: 4.1.2
       commitizen:
         specifier: ^4.3.0
         version: 4.3.1(@types/node@22.13.5)(typescript@5.7.3)

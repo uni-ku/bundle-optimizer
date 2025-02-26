@@ -10,7 +10,5 @@ export default defineBuildConfig({
   },
   failOnWarn: false,
   // 排除隐式外部依赖
-  externals: [
-    'chalk',
-  ],
+  externals: [],
 })
