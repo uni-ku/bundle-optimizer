@@ -64,6 +64,35 @@ pnpm add -D @uni-ku/bundle-optimizer
 - CLI: `直接编写` 根目录下的 vite.config.*
 - HBuilderX: 需要根据你所使用语言, 在根目录下 `创建`  vite.config.*
 
+##### 简单配置：
+
+```js
+// vite.config.*
+import Uni from '@dcloudio/vite-plugin-uni'
+import Optimization from '@uni-ku/bundle-optimizer'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  plugins: [
+    Uni(),
+    Optimization({
+      enable: {
+        'optimization': true,
+        'async-import': true,
+        'async-component': true,
+      },
+      dts: {
+        enable: true,
+        base: './',
+      },
+      logger: true,
+    }),
+  ],
+})
+```
+
+##### 详细配置说明
+
 ```js
 // vite.config.*
 import Uni from '@dcloudio/vite-plugin-uni'
