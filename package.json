@@ -45,7 +45,7 @@
     "release": "npm run build && bumpp",
     "prepublishOnly": "npm run build",
     "prepare": "simple-git-hooks && npm run build",
-    "lint": "eslint . --fix --flag unstable_ts_config",
+    "lint": "eslint . --fix",
     "commit": "git-cz",
     "example1:dev:h5": "npm -C examples/vue3+vite+ts run dev",
     "example1:build:h5": "npm -C examples/vue3+vite+ts run build",
@@ -53,8 +53,7 @@
     "example1:build:mp-weixin": "npm -C examples/vue3+vite+ts run build:mp-weixin"
   },
   "peerDependencies": {
-    "rollup": ">=4.0.0",
-    "vite": ">=5.0.0"
+    "vite": "^4.0.0 || ^5.0.0"
   },
   "dependencies": {
     "@dcloudio/uni-cli-shared": "3.0.0-4020820240925001",
@@ -63,7 +62,7 @@
     "minimatch": "^9.0.5"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^3.12.0",
+    "@antfu/eslint-config": "^4.3.0",
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
     "@types/node": "^22.10.2",
@@ -71,12 +70,13 @@
     "chalk": "^4.1.2",
     "commitizen": "^4.3.0",
     "cz-git": "^1.9.1",
-    "eslint": "^9.17.0",
+    "eslint": "^9.21.0",
+    "jiti": "^2.4.2",
     "lint-staged": "^15.2.2",
-    "rollup": "^4.0.0",
     "simple-git-hooks": "^2.11.1",
+    "typescript": "^5.7.3",
     "unbuild": "^2.0.0",
-    "vite": "^5.0.0"
+    "vite": "^4.0.0"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged",

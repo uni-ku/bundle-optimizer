@@ -1,4 +1,4 @@
-import type { Enable, IDtsOptions, IOptions } from '../type.d'
+import type { Enable, IDtsOptions, IOptions } from '../type'
 import { normalizePath } from '../utils'
 
 export class ParseOptions {

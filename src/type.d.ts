@@ -1,3 +1,19 @@
+import type { BuildOptions, IndexHtmlTransformContext, ModuleNode, splitVendorChunk } from 'vite'
+
+// #region Rollup 相关类型定义获取
+type ExtractOutputOptions<T> = T extends (infer U)[] ? U : T extends undefined ? never : T
+export type OutputOptions = ExtractOutputOptions<Exclude<BuildOptions['rollupOptions'], undefined>['output']>
+
+export type ManualChunksOption = OutputOptions['manualChunks']
+
+export type ModuleInfo = Exclude<ModuleNode['info'], undefined>
+
+type GetManualChunk = ReturnType<typeof splitVendorChunk>
+export type ManualChunkMeta = Parameters<GetManualChunk>['1']
+
+export type OutputChunk = Exclude<IndexHtmlTransformContext['chunk'], undefined>
+// #endregion
+
 export interface ISubPkgsInfo {
   root: string
   independent: boolean

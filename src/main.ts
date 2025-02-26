@@ -1,9 +1,8 @@
 /* eslint-disable no-console */
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable node/prefer-global/process */
-import type { GetManualChunk, ModuleInfo, RollupOptions } from 'rollup'
 import type { Plugin } from 'vite'
-import type { ISubPkgsInfo } from './type'
+import type { ISubPkgsInfo, ManualChunksOption, ModuleInfo } from './type'
 import fs from 'node:fs'
 import path from 'node:path'
 import { parseManifestJsonOnce, parseMiniProgramPagesJson } from '@dcloudio/uni-cli-shared'
@@ -129,10 +128,10 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
       const originalOutput = config?.build?.rollupOptions?.output
 
       const existingManualChunks
-        = (Array.isArray(originalOutput) ? originalOutput[0]?.manualChunks : originalOutput?.manualChunks) as GetManualChunk
+        = (Array.isArray(originalOutput) ? originalOutput[0]?.manualChunks : originalOutput?.manualChunks) as ManualChunksOption
 
       // 合并已有的 manualChunks 配置
-      const mergedManualChunks: GetManualChunk = (id, meta) => {
+      const mergedManualChunks: ManualChunksOption = (id, meta) => {
         const normalizedId = normalizePath(id)
         const filename = normalizedId.split('?')[0]
 
@@ -216,7 +215,7 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
         // #endregion
 
         // 调用已有的 manualChunks 配置 ｜ 此处必须考虑到原有的配置，是为了使 uniapp 原本的分包配置生效
-        if (existingManualChunks)
+        if (existingManualChunks && typeof existingManualChunks === 'function')
           return existingManualChunks(id, meta)
       }
 
@@ -226,7 +225,7 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
             output: {
               manualChunks: mergedManualChunks,
             },
-          } as RollupOptions,
+          },
         },
       }
     },

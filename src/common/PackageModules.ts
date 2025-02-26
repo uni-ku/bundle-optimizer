@@ -1,4 +1,4 @@
-import type { ManualChunkMeta, ModuleInfo } from 'rollup'
+import type { ManualChunkMeta, ModuleInfo } from '../type'
 
 // **直接**引入到包内的`模块A`是能被得知并编译到包内的
 // 而`模块A`引入的`模块B`是不能被得知的，因为`模块A`是`模块B`的引入者，`模块B`是`模块A`的依赖

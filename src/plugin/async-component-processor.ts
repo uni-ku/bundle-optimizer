@@ -1,15 +1,17 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import type { Plugin } from 'vite'
-import type { DtsType } from '../type.d'
+import type { TemplateDescriptor } from '../common/AsyncComponents'
+import type { DtsType } from '../type'
+import type { ArgumentLocation } from '../utils'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { normalizeMiniProgramFilename, removeExt } from '@dcloudio/uni-cli-shared'
 import MagicString from 'magic-string'
-import { AsyncComponents, type TemplateDescriptor } from '../common/AsyncComponents'
+import { AsyncComponents } from '../common/AsyncComponents'
 import { logger } from '../common/Logger'
 import { ROOT_DIR } from '../constants'
-import { type ArgumentLocation, calculateRelativePath, ensureDirectoryExists, findFirstNonConsecutiveBefore, getVitePathResolver, kebabCase, lexDefaultImportWithQuery, lexFunctionCalls, normalizePath } from '../utils'
+import { calculateRelativePath, ensureDirectoryExists, findFirstNonConsecutiveBefore, getVitePathResolver, kebabCase, lexDefaultImportWithQuery, lexFunctionCalls, normalizePath } from '../utils'
 
 /**
  * 处理 `import xxx from "*.vue?async"` 形式的调用
