@@ -2,6 +2,8 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import groupBy from 'lodash/groupBy'
+import cloneDeep from 'lodash/cloneDeep'
+import { MathUtils } from "@/lib/demo"
 
 /** 刷新页面 */
 function refresh() {
@@ -12,12 +14,16 @@ function refresh() {
 
 const result = ref<any>(null)
 onMounted(() => {
+  AsyncImport('@/pages-sub-async/plugin').then((res) => {
+    res.AsyncPluginDemo().run()
+  })
   AsyncImport('@/pages-sub-demo/index.vue').then((res) => {
     console.log('[async-import-component]', res.default)
     setTimeout(() => {
       result.value = res.default
     }, 1000)
   })
+  console.log(MathUtils.add(1, 1), cloneDeep({}));
 })
 </script>
 
