@@ -226,8 +226,8 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
           }
 
           if (!isMain) {
-            // 直系（浅层）判断 => 打入子包
-            if (matchSubPackages.size === 1) {
+            // 直系（浅层）判断 => 打入子包（必须判断是否有没有非子包的引用的模块，因为暂时无法判断第三方的模块的依赖链的情况）
+            if (matchSubPackages.size === 1 && !hasNoSubPackage(importers)) {
               return `${matchSubPackages.values().next().value}common/vendor`
             }
 
