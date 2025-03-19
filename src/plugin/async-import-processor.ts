@@ -119,10 +119,10 @@ export function AsyncImportProcessor(options: DtsType, enableLogger: boolean): P
           }
           else {
             // 处理其他的文件的hash化路径映射情况
-            const temp = chunk.moduleIds.filter((id) => {
-              const _id = id.startsWith('\x00') ? id.slice(1) : id
-              return _id !== 'plugin-vue:export-helper'
-            })
+            const temp = chunk.moduleIds.filter(id =>
+              !id.startsWith('\x00')
+              && !moduleIdProcessor(id).includes('node_modules/'))
+
             if (temp.length === 1) {
               acc[moduleIdProcessor(temp[0])] = chunk.fileName
             }
@@ -165,7 +165,7 @@ export function AsyncImportProcessor(options: DtsType, enableLogger: boolean): P
                 // 去除相对路径的前缀，例如`./`、`../`、`../../`等正确的相对路径的写法，`.../`是不正确的
                 if (
                   isMP
-                    ? Object.values(hashFileMap).flat().includes(url.replace(/^(\.\/|\.\.\/)+/, ''))
+                    ? Object.values(hashFileMap).flat().includes(normalizePath(path.posix.join(path.dirname(chunk.fileName), url)))
                     : Object.values(hashFileMap).flat().map(resolveAssetsPath).includes(url)
                 ) {
                   magicString.overwrite(full.start, full.start + 'AsyncImport'.length, isMP ? 'require.async' : 'import', { contentOnly: true })
