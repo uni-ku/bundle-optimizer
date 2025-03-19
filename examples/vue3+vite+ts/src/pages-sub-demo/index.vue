@@ -2,7 +2,9 @@
 <script lang="ts" setup>
 import SubComponent from '@/pages-sub-async/component.vue?async'
 import { onMounted } from 'vue'
-import { getSubPackageTestApi } from './api';
+import { getSubPackageTestApi } from './api'
+import { MathUtils } from '@/lib/demo'
+import cloneDeep from 'lodash/cloneDeep'
 
 function goSubPage() {
   uni.navigateTo({
@@ -15,6 +17,7 @@ onMounted(async () => {
     res.AsyncPluginDemo().run()
   })
   getSubPackageTestApi("子包 api 请求模拟")
+  console.log(MathUtils.add(0.1, 0.2), cloneDeep({}));
 })
 </script>
 

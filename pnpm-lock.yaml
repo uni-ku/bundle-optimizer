@@ -91,6 +91,9 @@ importers:
       '@dcloudio/uni-mp-weixin':
         specifier: 3.0.0-4020820240925001
         version: 3.0.0-4020820240925001(postcss@8.5.3)(rollup@4.34.8)(vue@3.4.21(typescript@5.7.3))
+      '@https-enable/colors':
+        specifier: ^0.1.1
+        version: 0.1.1
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -110,6 +113,9 @@ importers:
       '@dcloudio/vite-plugin-uni':
         specifier: 3.0.0-4020820240925001
         version: 3.0.0-4020820240925001(postcss@8.5.3)(rollup@4.34.8)(vite@4.5.9(@types/node@22.13.5)(terser@5.39.0))(vue@3.4.21(typescript@5.7.3))
+      '@https-enable/types':
+        specifier: ^0.1.1
+        version: 0.1.1
       '@types/lodash':
         specifier: ^4.17.13
         version: 4.17.15
@@ -1528,6 +1534,12 @@ packages:
   '@eslint/plugin-kit@0.2.7':
     resolution: {integrity: sha512-JubJ5B2pJ4k4yGxaNLdbjrnk9d/iDz6/q8wOilpIowd6PJPgaxCuHBnBszq7Ce2TyMrywm5r4PnKm6V3iiZF+g==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@https-enable/colors@0.1.1':
+    resolution: {integrity: sha512-tUEFVOnGqdsghSq0mDNMj+450A/T05Q07JFaOgj3MNrB+jduRZyOXqQEZY4JVuvvDYsrfFlS/BOBe69g57ff6A==}
+
+  '@https-enable/types@0.1.1':
+    resolution: {integrity: sha512-0smVD8StR6QCBAGCgf3xlNVEoG2nlWJ/0nISeSQn2jt9JQoWq/Ygm5enbbnVEhLfwSxgnkPhhYtCO3ZZCT6IOQ==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -7595,6 +7607,10 @@ snapshots:
     dependencies:
       '@eslint/core': 0.12.0
       levn: 0.4.1
+
+  '@https-enable/colors@0.1.1': {}
+
+  '@https-enable/types@0.1.1': {}
 
   '@humanfs/core@0.19.1': {}
 
