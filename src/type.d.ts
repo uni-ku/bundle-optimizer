@@ -10,7 +10,10 @@ export type OutputOptions = ExtractOutputOptions<Exclude<BuildOptions['rollupOpt
 
 export type ManualChunksOption = OutputOptions['manualChunks']
 
-export type ModuleInfo = Exclude<ModuleNode['info'], undefined>
+export type ModuleInfo = Pick<
+  Exclude<ModuleNode['info'], undefined>,
+'id' | 'meta' | 'importers' | 'importedIds' | 'importedIdResolutions' | 'dynamicImporters' | 'dynamicallyImportedIds' | 'dynamicallyImportedIdResolutions'
+> & { isMain?: boolean }
 
 type GetManualChunk = ReturnType<typeof splitVendorChunk>
 export type ManualChunkMeta = Parameters<GetManualChunk>['1']
