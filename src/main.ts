@@ -7,8 +7,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { parseManifestJsonOnce, parseMiniProgramPagesJson } from '@dcloudio/uni-cli-shared'
 import { logger } from './common/Logger'
-import { PackageModules } from './common/PackageModules'
-import { EXTNAME_JS_RE } from './constants'
+import { EXTNAME_JS_RE, ROOT_DIR } from './constants'
 import { moduleIdProcessor as _moduleIdProcessor, normalizePath } from './utils'
 
 /**
@@ -45,8 +44,6 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
   const normalSubPackageRoots = subPkgsInfo.filter(normalFilter).map(map2Root)
   const independentSubpackageRoots = subPkgsInfo.filter(independentFilter).map(map2Root)
 
-  const PackageModulesInstance = new PackageModules(moduleIdProcessor)
-
   /**
    * # id处理器
    * @description 将id中的moduleId转换为相对于inputDir的路径并去除查询参数后缀
@@ -54,6 +51,33 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
   function moduleIdProcessor(id: string) {
     return _moduleIdProcessor(id, process.env.UNI_INPUT_DIR)
   }
+  /**
+   * 判断该文件模块的来源
+   */
+  const moduleFrom = (id: string):
+    { from: 'main' | 'node_modules', clearId: string }
+    | { from: 'sub', clearId: string, pkgRoot: string }
+    | undefined => {
+    let root = normalizePath(ROOT_DIR)
+    if (!root.endsWith('/'))
+      root = `${root}/`
+
+    const clearId = moduleIdProcessor(id)
+
+    if (!path.isAbsolute(clearId)) {
+      const pkgRoot = normalSubPackageRoots.find(root => moduleIdProcessor(clearId).indexOf(root) === 0)
+      if (pkgRoot === undefined)
+        return { from: 'main', clearId }
+      else
+        return { from: 'sub', clearId, pkgRoot }
+    }
+    else {
+      // clearId.startsWith(root) && TODO: 放宽条件，兼容 workspace 项目
+      if (clearId.includes('/node_modules/'))
+        return { from: 'node_modules', clearId }
+    }
+  }
+
   /** 查找模块列表中是否有属于子包的模块 */
   const findSubPackages = function (importers: readonly string[]) {
     return importers.reduce((pkgs, item) => {
@@ -132,6 +156,40 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
 
       // 合并已有的 manualChunks 配置
       const mergedManualChunks: ManualChunksOption = (id, meta) => {
+        /** 依赖图谱分析 */
+        function getDependencyGraph(startId: string, getRelated: (info: ModuleInfo) => readonly string[] = info => info.importers): string[] {
+          const visited = new Set<string>()
+          const result: string[] = []
+
+          // 支持自定义遍历方向的泛化实现
+          function traverse(
+            currentId: string,
+            getRelated: (info: ModuleInfo) => readonly string[], // 控制遍历方向的回调函数
+          ) {
+            if (visited.has(currentId))
+              return
+
+            visited.add(currentId)
+            result.push(currentId)
+
+            const moduleInfo = meta.getModuleInfo(currentId)
+            if (!moduleInfo)
+              return
+
+            getRelated(moduleInfo).forEach((relatedId) => {
+              traverse(relatedId, getRelated)
+            })
+          }
+
+          // 示例：向上追踪 importers（谁导入了当前模块）
+          traverse(startId, getRelated)
+
+          // 若需要向下追踪 dependencies（当前模块导入了谁）：
+          // traverse(startId, (info) => info.dependencies);
+
+          return result
+        }
+
         const normalizedId = normalizePath(id)
         const filename = normalizedId.split('?')[0]
 
@@ -145,73 +203,45 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
           }
           const importers = moduleInfo.importers || [] // 依赖当前模块的模块id
           const matchSubPackages = findSubPackages(importers)
-          let subPackageRoot: string | undefined = matchSubPackages.values().next().value
 
-          const matchSubpackageModules = PackageModulesInstance.findModuleInImporters(importers) || {}
-          const matchSubpackage = Object.keys(matchSubpackageModules)[0] // 当前仅支持一个子包引用
-          /**
-           * - 强制将commonjsHelpers.js放入主包，即使这样主包会大1kb左右
-           * - 当主包、分包都需要commonjsHelpers.js时，子包会从主包引入commonjsHelpers.js
-           * - 但是子包热更新时，会出现问题主包从分包中引入commonjsHelpers.js的情况，这是不允许的，
-           * - 虽然重新运行可以解决问题，但是这样开发体验不好
-           */
-          const isCommonjsHelpers = id.includes('commonjsHelpers.js')
+          const moduleFromInfos = moduleFrom(id)
 
-          if (!isCommonjsHelpers) {
-            if (((matchSubPackages.size === 1 && !hasNoSubPackage(importers))
-              || (matchSubpackage && hasNodeModules(importers) // 再次确定此模块来自`node_modules`
-              ))
-              && !hasMainPackageComponent(moduleInfo, subPackageRoot)
-            ) {
-              if (!subPackageRoot) {
-                subPackageRoot = matchSubpackage
-              }
-              PackageModulesInstance.addModuleRecord(subPackageRoot, moduleInfo) // 模块引入子包记录，用于链式依赖的索引
+          let isMain = false
+          if (
+            // 未知来源的模块、commonjsHelpers => 打入主包
+            (!moduleFromInfos || moduleFromInfos.clearId === 'commonjsHelpers.js')
+            // 主包未被引用的模块 => 打入主包（要么是项目主入口文件、要么就是存在隐式引用）
+            // 主包没有匹配到子包的引用 => 打入主包（只被主包引用）
+            || (moduleFromInfos.from === 'main' && (!importers.length || !matchSubPackages.size))
+            // 主包下的文件，且被非子包模块引用，只能说明被主包其他模块引用（第三方模块不可能引用到项目里面的模块文件）
+            // => 打入主包
+            || (moduleFromInfos.from === 'main' && hasNoSubPackage(importers))
+            // 直系（浅层）依赖判断：匹配到多个子包的引用 => 打入主包
+            || matchSubPackages.size > 1
+          ) {
+            // 这里使用 flag 控制，而不能使用 return
+            // 直接 return 和 return "common/vendor" 都是不对的
+            // 直接放空，让后续的插件自行抉择
+            isMain = true
+          }
 
-              return `${subPackageRoot}common/vendor`
+          if (!isMain) {
+            // 直系（浅层）判断 => 打入子包
+            if (matchSubPackages.size === 1) {
+              return `${matchSubPackages.values().next().value}common/vendor`
             }
-            else {
-              const result = PackageModulesInstance.processModule(moduleInfo)
-              // 排除掉含有非子包引用，且不是`node_modules`下的模块，这说明这个模块是主包的模块
-              if (result?.[0] && !(hasNoSubPackage(importers) && !hasNodeModules(importers))) {
-                return `${result[0]}common/vendor`
-              }
 
-              // #region 判断是否只被子包和 node_modules 的包引用
-              // 排除子包和node_modules的importers | 剩下的都是主包的模块
-              const mainPackageImporters = importers.filter((item) => {
-                return !subPackageRoots.some(root => moduleIdProcessor(item).indexOf(root) === 0) && !moduleIdProcessor(item).includes('node_modules')
-              })
-              if ((!mainPackageImporters || !mainPackageImporters.length) && subPackageRoot && hasNodeModules(importers)) {
-                const nodeModulesInfo = importers.filter(item => item.includes('node_modules')).map(item => meta.getModuleInfo(item))
-                for (let index = 0; index < nodeModulesInfo.length; index++) {
-                  const info = nodeModulesInfo[index]
-                  if (info?.importers) {
-                    const matchSubPackages = findSubPackages(info.importers)
-                    let _subPackageRoot: string | undefined = matchSubPackages.values().next().value
-                    const matchSubpackageModules = PackageModulesInstance.findModuleInImporters(importers) || {}
-                    const matchSubpackage = Object.keys(matchSubpackageModules)[0] // 当前仅支持一个子包引用
+            // --- 接下来都是判断 matchSubPackages.size 为 0 的情况 ---
 
-                    if (((matchSubPackages.size === 1 && !hasNoSubPackage(info.importers))
-                      || (matchSubpackage && hasNodeModules(info.importers)
-                      ))
-                      && !hasMainPackageComponent(info, _subPackageRoot)) {
-                      if (!_subPackageRoot) {
-                        _subPackageRoot = matchSubpackage
-                      }
-
-                      if (_subPackageRoot === subPackageRoot) {
-                        PackageModulesInstance.addModuleRecord(_subPackageRoot, moduleInfo) // 模块引入子包记录，用于链式依赖的索引
-                        return `${_subPackageRoot}common/vendor`
-                      }
-                    }
-                  }
-                }
-              }
-              // #endregion
+            // 搜寻依赖链图谱
+            const importersGraph = getDependencyGraph(id)
+            const newMatchSubPackages = findSubPackages(importersGraph)
+            if (newMatchSubPackages.size === 1) {
+              return `${newMatchSubPackages.values().next().value}common/vendor`
             }
           }
         }
+
         // #endregion
 
         // 调用已有的 manualChunks 配置 ｜ 此处必须考虑到原有的配置，是为了使 uniapp 原本的分包配置生效
@@ -228,10 +258,6 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
           },
         },
       }
-    },
-    buildStart() {
-      // 每次新的打包时，清空`模块记录`，主要避免热更新时上次构建时的`模块记录`导致热更新构建混乱
-      PackageModulesInstance.clearModuleRecord()
     },
   }
 }

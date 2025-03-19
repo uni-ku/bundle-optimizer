@@ -9,8 +9,9 @@ export class PackageModules {
    * 包的模块信息记录
    *
    * @description 记录一个包中引入的模块信息
+   * @description key 为 undefined 时，表示是主包的模块信息
    */
-  private modulesRecord: { [packageId: string]: { [moduleId: string]: ModuleInfo } } = {}
+  private modulesRecord: Record<string, { [moduleId: string]: ModuleInfo }> = {}
 
   public chunkMeta: null | ManualChunkMeta = null
 
@@ -28,7 +29,7 @@ export class PackageModules {
   /**
    * add module record
    */
-  public addModuleRecord(packageId: string, moduleInfo: ModuleInfo) {
+  public addModuleRecord(packageId: string | undefined, moduleInfo: ModuleInfo) {
     let moduleId = moduleInfo.id
     if (!moduleId)
       return
@@ -38,11 +39,21 @@ export class PackageModules {
     if (!moduleId)
       return
 
-    if (!this.modulesRecord[packageId]) {
-      this.modulesRecord[packageId] = {}
+    if (!this.modulesRecord[`${packageId}`]) {
+      this.modulesRecord[`${packageId}`] = {}
     }
 
-    this.modulesRecord[packageId][moduleId] = moduleInfo
+    this.modulesRecord[`${packageId}`][moduleId] = {
+      isMain: packageId === undefined,
+      id: moduleInfo.id,
+      meta: moduleInfo.meta,
+      importers: moduleInfo.importers,
+      importedIds: moduleInfo.importedIds,
+      importedIdResolutions: moduleInfo.importedIdResolutions,
+      dynamicImporters: moduleInfo.dynamicImporters,
+      dynamicallyImportedIds: moduleInfo.dynamicallyImportedIds,
+      dynamicallyImportedIdResolutions: moduleInfo.dynamicallyImportedIdResolutions,
+    }
   }
 
   /**
