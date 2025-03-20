@@ -55,9 +55,8 @@ export function AsyncImportProcessor(options: DtsType, enableLogger: boolean): P
     transform(code, id) {
       const asyncImports = parseAsyncImports(code)
 
-      const magicString = new MagicString(code)
-
       if (asyncImports.length > 0 && !isApp) {
+        const magicString = new MagicString(code)
         // 生成类型定义文件
         const paths = asyncImports.map(item => item.args[0].value.toString())
         generateTypeFile(paths)
@@ -69,11 +68,11 @@ export function AsyncImportProcessor(options: DtsType, enableLogger: boolean): P
             magicString.overwrite(full.start, full.start + 'AsyncImport'.length, 'import', { contentOnly: true })
           })
         })
-      }
 
-      return {
-        code: magicString.toString(),
-        map: magicString.generateMap({ hires: true }),
+        return {
+          code: magicString.toString(),
+          map: magicString.generateMap({ hires: true }),
+        }
       }
     },
     renderDynamicImport(options) {
