@@ -1,7 +1,7 @@
 <!-- eslint-disable no-console -->
 <script lang="ts" setup>
 import SubComponent from '@/pages-sub-async/component.vue?async'
-import { onMounted } from 'vue'
+import { onMounted, shallowRef } from 'vue'
 import { getSubPackageTestApi } from './api'
 import { MathUtils } from '@/lib/demo'
 import cloneDeep from 'lodash/cloneDeep'
@@ -12,12 +12,19 @@ function goSubPage() {
   })
 }
 
+const asyncComponent = shallowRef<any>()
+
 onMounted(async () => {
   AsyncImport('@/pages-sub-async/plugin').then((res) => {
     res.AsyncPluginDemo().run()
   })
   getSubPackageTestApi("子包 api 请求模拟")
   console.log(MathUtils.add(0.1, 0.2), cloneDeep({}));
+
+  // 加载异步组件
+  AsyncImport('./components/demo1.vue').then((res) => {
+    asyncComponent.value = res.default
+  })
 })
 </script>
 
@@ -33,6 +40,15 @@ onMounted(async () => {
     <button @click="goSubPage">
       go go go
     </button>
+    <view>
+      <!-- 只有非小程序端，才支持动态组件渲染 -->
+      <!-- #ifndef MP -->
+      <component :is="asyncComponent"></component>
+      <!-- #endif -->
+      <!-- #ifdef MP -->
+      <view style="background-color: gray;color: aliceblue;font-size: small;padding: 16rpx;margin: 16rpx;">小程序端无法动态渲染远程组件</view>
+      <!-- #endif -->
+    </view>
   </view>
 </template>
 
