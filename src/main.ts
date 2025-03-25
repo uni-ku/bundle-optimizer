@@ -100,6 +100,23 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
       return moduleIdProcessor(item).includes('node_modules')
     })
   }
+  /** 查找来自 主包 下的依赖 */
+  const findMainPackage = function (importers: readonly string[]) {
+    const list = importers.filter((item) => {
+      const id = moduleIdProcessor(item)
+      // 排除掉子包和第三方包之后，剩余的视为主包
+      return !subPackageRoots.some(root => id.indexOf(root) === 0) && !id.includes('node_modules')
+    })
+    return list
+  }
+  /** 查找来自 主包 下的组件 */
+  const findMainPackageComponent = function (importers: readonly string[]) {
+    const list = findMainPackage(importers)
+    const mainPackageComponent = new Set(list
+      .map(item => moduleIdProcessor(item))
+      .filter(name => name.endsWith('.vue') || name.endsWith('.nvue')))
+    return mainPackageComponent
+  }
   /** 判断该模块引用的模块是否有跨包引用的组件 */
   const hasMainPackageComponent = function (moduleInfo: Partial<ModuleInfo>, subPackageRoot?: string) {
     if (moduleInfo.id && moduleInfo.importedIdResolutions) {
@@ -203,6 +220,8 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
           }
           const importers = moduleInfo.importers || [] // 依赖当前模块的模块id
           const matchSubPackages = findSubPackages(importers)
+          // 查找直接引用关系中是否有主包的组件文件模块
+          const mainPackageComponent = findMainPackageComponent(importers)
 
           const moduleFromInfos = moduleFrom(id)
 
@@ -213,9 +232,8 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
             // 主包未被引用的模块 => 打入主包（要么是项目主入口文件、要么就是存在隐式引用）
             // 主包没有匹配到子包的引用 => 打入主包（只被主包引用）
             || (moduleFromInfos.from === 'main' && (!importers.length || !matchSubPackages.size))
-            // 主包下的文件，且被非子包模块引用，只能说明被主包其他模块引用（第三方模块不可能引用到项目里面的模块文件）
-            // => 打入主包
-            || (moduleFromInfos.from === 'main' && hasNoSubPackage(importers))
+            // 直系（浅层）依赖判断：匹配到存在主包组件的引用
+            || mainPackageComponent.size > 0
             // 直系（浅层）依赖判断：匹配到多个子包的引用 => 打入主包
             || matchSubPackages.size > 1
           ) {
@@ -231,12 +249,14 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
               return `${matchSubPackages.values().next().value}common/vendor`
             }
 
-            // --- 接下来都是判断 matchSubPackages.size 为 0 的情况 ---
-
-            // 搜寻依赖链图谱
+            // 搜寻引用图谱
             const importersGraph = getDependencyGraph(id)
             const newMatchSubPackages = findSubPackages(importersGraph)
-            if (newMatchSubPackages.size === 1) {
+            // 查找引用图谱中是否有主包的组件文件模块
+            const newMainPackageComponent = findMainPackageComponent(importersGraph)
+
+            // 引用图谱中只找到一个子包的引用，并且没有出现主包的组件，则说明只归属该子包
+            if (newMatchSubPackages.size === 1 && newMainPackageComponent.size === 0) {
               return `${newMatchSubPackages.values().next().value}common/vendor`
             }
           }
