@@ -1,5 +1,13 @@
 extends:
   - '@commitlint/config-conventional'
+
+# https://github.com/conventional-changelog/conventional-changelog/issues/234#issuecomment-766839160
+# https://github.com/ccnnde/commitlint-config-git-commit-emoji/blob/master/index.js#L4
+parserPreset:
+  parserOpts:
+    headerPattern: ^((?<emoji_left>(?::\w*:|\ud83c[\udde0-\uddff]|\ud83c[\udf00-\udfff]|\ud83d[\ude00-\ude4f]|\ud83d[\ude80-\udeff]|\ud83d[\udf00-\udf7f]|\ud83d[\udf80-\udfff]|\ud83e[\udc00-\udcff]|\ud83e[\udd00-\uddff]|\ud83e[\ude00-\ude6f]|\ud83e[\ude70-\udeff]|[\u2600-\u2B55]))\s)?(?<type>\w+)(?:\((?<scope>[^)]*)\))?!?:\s((?<emoji_center>(?::\w*:|\ud83c[\udde0-\uddff]|\ud83c[\udf00-\udfff]|\ud83d[\ude00-\ude4f]|\ud83d[\ude80-\udeff]|\ud83d[\udf00-\udf7f]|\ud83d[\udf80-\udfff]|\ud83e[\udc00-\udcff]|\ud83e[\udd00-\uddff]|\ud83e[\ude00-\ude6f]|\ud83e[\ude70-\udeff]|[\u2600-\u2B55]))\s)?(?<subject>(?:(?!#).)*(?:(?!\s).))(?:\s(?<ticket>#(?<ticket_number1>\w+)|\(#(?<ticket_number2>\w+)\)))?(?:\s(?<emoji_right>(?::\w*:|\ud83c[\udde0-\uddff]|\ud83c[\udf00-\udfff]|\ud83d[\ude00-\ude4f]|\ud83d[\ude80-\udeff]|\ud83d[\udf00-\udf7f]|\ud83d[\udf80-\udfff]|\ud83e[\udc00-\udcff]|\ud83e[\udd00-\uddff]|\ud83e[\ude00-\ude6f]|\ud83e[\ude70-\udeff]|[\u2600-\u2B55])))?$
+    headerCorrespondence: ['emoji_left_', 'emoji_left', 'type', 'scope', 'emoji_center_', 'emoji_center', 'subject', 'ticket', 'ticket_number1', 'ticket_number2', 'emoji_right']
+
 rules:
   type-enum:
     - 2
@@ -17,6 +25,7 @@ rules:
       - test
       - style
       - ci
+      - init
 prompt:
   messages:
     type: '选择你要提交的类型 :'
@@ -66,6 +75,10 @@ prompt:
     - value: ci
       name: '🤖 CI: 持续集成'
       emoji: 🤖
+    - value: init
+      name: '🎉 Init: 项目初始化'
+      emoji: 🎉
   useEmoji: true
+  emojiAlign: left
   scopes: []
   maxHeaderLength: 72

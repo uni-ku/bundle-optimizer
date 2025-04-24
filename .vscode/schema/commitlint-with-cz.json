@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "allOf": [
+    { "$ref": "commitlint-patch.json" }
+  ],
+  "properties": {
+    "prompt": {
+      "description": "Prompt settings (git-cz)",
+      "$ref": "cz-git.json"
+    }
+  }
+}

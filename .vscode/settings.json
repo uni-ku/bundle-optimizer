@@ -12,6 +12,6 @@
   "eslint.useFlatConfig": true,
 
   "yaml.schemas": {
-    "schema/commitlint-with-cz.json": ".commitlintrc.yaml"
+    ".vscode/schema/commitlint-with-cz.json": ".commitlintrc.yaml"
   }
 }
