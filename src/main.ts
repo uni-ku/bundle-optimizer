@@ -2,7 +2,7 @@
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable node/prefer-global/process */
 import type { Plugin } from 'vite'
-import type { ISubPkgsInfo, ManualChunksOption, ModuleInfo } from './type'
+import type { ISubPkgsInfo, ManualChunkMeta, ManualChunksOption, ModuleInfo } from './type'
 import fs from 'node:fs'
 import path from 'node:path'
 import { parseManifestJsonOnce, parseMiniProgramPagesJson } from '@dcloudio/uni-cli-shared'
@@ -117,6 +117,11 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
       .filter(name => name.endsWith('.vue') || name.endsWith('.nvue')))
     return mainPackageComponent
   }
+  /** 判断是否含有项目入口文件的依赖 */
+  const hasEntryFile = function (importers: readonly string[], meta: ManualChunkMeta) {
+    const list = findMainPackage(importers)
+    return list.some(item => meta.getModuleInfo(item)?.isEntry)
+  }
   /** 判断该模块引用的模块是否有跨包引用的组件 */
   const hasMainPackageComponent = function (moduleInfo: Partial<ModuleInfo>, subPackageRoot?: string) {
     if (moduleInfo.id && moduleInfo.importedIdResolutions) {
@@ -222,6 +227,8 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
           const matchSubPackages = findSubPackages(importers)
           // 查找直接引用关系中是否有主包的组件文件模块
           const mainPackageComponent = findMainPackageComponent(importers)
+          // 是否有被项目入口文件直接引用
+          const isEntry = hasEntryFile(importers, meta)
 
           const moduleFromInfos = moduleFrom(id)
 
@@ -229,6 +236,8 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
           if (
             // 未知来源的模块、commonjsHelpers => 打入主包
             (!moduleFromInfos || moduleFromInfos.clearId === 'commonjsHelpers.js')
+            // 被入口文件直接引用的 => 打入主包
+            || isEntry
             // 主包未被引用的模块 => 打入主包（要么是项目主入口文件、要么就是存在隐式引用）
             // 主包没有匹配到子包的引用 => 打入主包（只被主包引用）
             || (moduleFromInfos.from === 'main' && (!importers.length || !matchSubPackages.size))
