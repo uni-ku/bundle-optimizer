@@ -5,6 +5,9 @@ import { onMounted, shallowRef } from 'vue'
 import { getSubPackageTestApi } from './api'
 import { MathUtils } from '@/lib/demo'
 import cloneDeep from 'lodash/cloneDeep'
+import demo from '@/api/test'
+
+demo('sub')
 
 function goSubPage() {
   uni.navigateTo({
