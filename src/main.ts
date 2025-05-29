@@ -67,7 +67,7 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
     if (!path.isAbsolute(clearId)) {
       const pkgRoot = normalSubPackageRoots.find(root => moduleIdProcessor(clearId).indexOf(root) === 0)
       if (pkgRoot === undefined)
-        return { from: 'main', clearId }
+        return { from: clearId.startsWith('node_modules/') ? 'node_modules' : 'main', clearId }
       else
         return { from: 'sub', clearId, pkgRoot }
     }
