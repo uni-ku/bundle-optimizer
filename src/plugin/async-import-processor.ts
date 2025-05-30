@@ -8,7 +8,7 @@ import MagicString from 'magic-string'
 import { AsyncImports } from '../common/AsyncImports'
 import { logger } from '../common/Logger'
 import { JS_TYPES_RE, ROOT_DIR, SRC_DIR_RE } from '../constants'
-import { ensureDirectoryExists, getVitePathResolver, lexFunctionCalls, moduleIdProcessor, normalizePath, parseAsyncImports, resolveAssetsPath } from '../utils'
+import { calculateRelativePath, ensureDirectoryExists, getVitePathResolver, lexFunctionCalls, moduleIdProcessor, normalizePath, parseAsyncImports, resolveAssetsPath } from '../utils'
 
 /**
  * 负责处理`AsyncImport`函数调用的传参路径
@@ -52,7 +52,7 @@ export function AsyncImportProcessor(options: DtsType, enableLogger: boolean): P
     name: 'async-import-processor',
     enforce: 'post', // 插件执行时机，在其他处理后执行
 
-    transform(code, id) {
+    async transform(code, id) {
       const asyncImports = parseAsyncImports(code)
 
       if (asyncImports.length > 0 && !isApp) {
@@ -61,13 +61,25 @@ export function AsyncImportProcessor(options: DtsType, enableLogger: boolean): P
         const paths = asyncImports.map(item => item.args[0].value.toString())
         generateTypeFile(paths)
 
-        asyncImports.forEach(({ full, args }) => {
-          args.forEach(({ start, end, value }) => {
+        for (const { full, args } of asyncImports) {
+          for (const { start, end, value } of args) {
             // 加入缓存
-            AsyncImportsInstance.addCache(moduleIdProcessor(id), value.toString())
+            const target = value.toString()
+            const normalizedPath = calculateRelativePath(id, target)
+
+            // target 可能是一个模块的裸引用
+            let resolveId = (await this.resolve(target, id))?.id
+            if (resolveId) {
+              resolveId = moduleIdProcessor(resolveId)
+              if (!(path.isAbsolute(resolveId) && normalizedPath !== resolveId)) {
+                resolveId = undefined
+              }
+            }
+
+            AsyncImportsInstance.addCache(moduleIdProcessor(id), target, resolveId)
             magicString.overwrite(full.start, full.start + 'AsyncImport'.length, 'import', { contentOnly: true })
-          })
-        })
+          }
+        }
 
         return {
           code: magicString.toString(),
@@ -80,9 +92,12 @@ export function AsyncImportProcessor(options: DtsType, enableLogger: boolean): P
       if (cache && options.targetModuleId && !isApp && !isH5) {
         // 如果是js文件的话去掉后缀
         const targetModuleId = moduleIdProcessor(options.targetModuleId).replace(JS_TYPES_RE, '')
-        if (cache.map(item => (item.match(/^(\.\/|\.\.\/)+/) ? path.resolve(path.dirname(options.moduleId), item) : getVitePathResolver()(item).replace(SRC_DIR_RE, 'src/')))
-          .some(item => moduleIdProcessor(item).replace(JS_TYPES_RE, '') === targetModuleId)
-        ) {
+        const temp = cache.map(item => ({
+          value: moduleIdProcessor(item.match(/^(\.\/|\.\.\/)+/) ? path.resolve(path.dirname(options.moduleId), item) : getVitePathResolver()(item).replace(SRC_DIR_RE, 'src/')),
+          realPath: AsyncImportsInstance.getRealPath(item)?.[0],
+        }))
+
+        if (temp.some(item => moduleIdProcessor(item.realPath ?? item.value).replace(JS_TYPES_RE, '') === targetModuleId)) {
           return {
             left: 'AsyncImport(',
             right: ')',
@@ -119,12 +134,10 @@ export function AsyncImportProcessor(options: DtsType, enableLogger: boolean): P
           else {
             // 处理其他的文件的hash化路径映射情况
             const temp = chunk.moduleIds.filter(id =>
-              !id.startsWith('\x00')
-              && !moduleIdProcessor(id).includes('node_modules/'))
-
-            if (temp.length === 1) {
-              acc[moduleIdProcessor(temp[0])] = chunk.fileName
-            }
+              !id.startsWith('\x00'))
+            temp.forEach((id) => {
+              acc[moduleIdProcessor(id)] = chunk.fileName
+            })
           }
         }
 
