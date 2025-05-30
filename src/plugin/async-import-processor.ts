@@ -8,7 +8,7 @@ import MagicString from 'magic-string'
 import { AsyncImports } from '../common/AsyncImports'
 import { logger } from '../common/Logger'
 import { JS_TYPES_RE, ROOT_DIR, SRC_DIR_RE } from '../constants'
-import { calculateRelativePath, ensureDirectoryExists, getVitePathResolver, lexFunctionCalls, moduleIdProcessor, normalizePath, parseAsyncImports, resolveAssetsPath } from '../utils'
+import { ensureDirectoryExists, getVitePathResolver, lexFunctionCalls, moduleIdProcessor, normalizePath, parseAsyncImports, resolveAssetsPath } from '../utils'
 
 /**
  * 负责处理`AsyncImport`函数调用的传参路径
@@ -65,15 +65,10 @@ export function AsyncImportProcessor(options: DtsType, enableLogger: boolean): P
           for (const { start, end, value } of args) {
             // 加入缓存
             const target = value.toString()
-            const normalizedPath = calculateRelativePath(id, target)
-
             // target 可能是一个模块的裸引用
             let resolveId = (await this.resolve(target, id))?.id
             if (resolveId) {
               resolveId = moduleIdProcessor(resolveId)
-              if (!(path.isAbsolute(resolveId) && normalizedPath !== resolveId)) {
-                resolveId = undefined
-              }
             }
 
             AsyncImportsInstance.addCache(moduleIdProcessor(id), target, resolveId)
