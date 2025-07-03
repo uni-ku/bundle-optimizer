@@ -227,8 +227,10 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
           const matchSubPackages = findSubPackages(importers)
           // 查找直接引用关系中是否有主包的组件文件模块
           const mainPackageComponent = findMainPackageComponent(importers)
-          // 是否有被项目入口文件直接引用
-          const isEntry = hasEntryFile(importers, meta)
+          /**
+           * 是否有被项目入口文件直接引用
+           */
+          let isEntry = hasEntryFile(importers, meta)
 
           const moduleFromInfos = moduleFrom(id)
 
@@ -264,6 +266,7 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
             const newMatchSubPackages = findSubPackages(importersGraph)
             // 查找引用图谱中是否有主包的组件文件模块
             const newMainPackageComponent = findMainPackageComponent(importersGraph)
+            isEntry = hasEntryFile(importersGraph, meta)
 
             // 引用图谱中只找到一个子包的引用，并且没有出现主包的组件以及入口文件(main.{ts|js})，则说明只归属该子包
             if (!isEntry && newMatchSubPackages.size === 1 && newMainPackageComponent.size === 0) {
