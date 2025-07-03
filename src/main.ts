@@ -217,7 +217,7 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
 
         // #region ⚠️ 以下代码是分包优化的核心逻辑
         // 处理项目内的js,ts文件
-        if (EXTNAME_JS_RE.test(filename) && (!filename.startsWith(inputDir) || filename.includes('node_modules'))) {
+        if (EXTNAME_JS_RE.test(filename) && (filename.startsWith(inputDir) || filename.includes('node_modules'))) {
           // 如果这个资源只属于一个子包，并且其调用组件的不存在跨包调用的情况，那么这个模块就会被加入到对应的子包中。
           const moduleInfo = meta.getModuleInfo(id)
           if (!moduleInfo) {
@@ -258,19 +258,20 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
               return `${matchSubPackages.values().next().value}common/vendor`
             }
 
-            // 搜寻引用图谱
-            const importersGraph = getDependencyGraph(id)
+            // #region 👋 此处的逻辑完全可以取代前面的所有分支判断
+            // 但是保留前面的过程，是因为当前逻辑是耗时的，提前通过一些浅显的判断判定引用结果
+            const importersGraph = getDependencyGraph(id) // 搜寻引用图谱
             const newMatchSubPackages = findSubPackages(importersGraph)
             // 查找引用图谱中是否有主包的组件文件模块
             const newMainPackageComponent = findMainPackageComponent(importersGraph)
 
-            // 引用图谱中只找到一个子包的引用，并且没有出现主包的组件，则说明只归属该子包
-            if (newMatchSubPackages.size === 1 && newMainPackageComponent.size === 0) {
+            // 引用图谱中只找到一个子包的引用，并且没有出现主包的组件以及入口文件(main.{ts|js})，则说明只归属该子包
+            if (!isEntry && newMatchSubPackages.size === 1 && newMainPackageComponent.size === 0) {
               return `${newMatchSubPackages.values().next().value}common/vendor`
             }
+            // #endregion
           }
         }
-
         // #endregion
 
         // 调用已有的 manualChunks 配置 ｜ 此处必须考虑到原有的配置，是为了使 uniapp 原本的分包配置生效
