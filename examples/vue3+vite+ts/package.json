@@ -15,7 +15,8 @@
     "@dcloudio/uni-mp-weixin": "3.0.0-4020820240925001",
     "@https-enable/colors": "^0.1.1",
     "lodash": "^4.17.21",
-    "vue": "3.4.21"
+    "vue": "3.4.21",
+    "@lixin-sdk/common-error-http-sdk": "workspace:*"
   },
   "devDependencies": {
     "@dcloudio/types": "^3.4.10",

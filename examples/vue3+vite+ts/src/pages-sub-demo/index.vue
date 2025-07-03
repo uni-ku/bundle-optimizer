@@ -6,6 +6,7 @@ import { getSubPackageTestApi } from './api'
 import { MathUtils } from '@/lib/demo'
 import cloneDeep from 'lodash/cloneDeep'
 import demo from '@/api/test'
+import { getErrorReasonStrValue } from '@/lib/ajax-grpc'
 
 demo('sub')
 
@@ -18,6 +19,8 @@ function goSubPage() {
 const asyncComponent = shallowRef<any>()
 
 onMounted(async () => {
+  console.log(getErrorReasonStrValue());
+
   AsyncImport('@/pages-sub-async/plugin').then((res) => {
     res.AsyncPluginDemo().run()
   })

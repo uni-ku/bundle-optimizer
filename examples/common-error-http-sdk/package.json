@@ -1,0 +1,43 @@
+{
+  "name": "@lixin-sdk/common-error-http-sdk",
+  "version": "0.6.9",
+  "description": "grpc-http 包",
+  "author": "lixin tech",
+  "license": "ISC",
+  "keywords": [],
+  "exports": {
+    "./lixin/common/error/v1/rpc": "./lixin/common/error/v1/rpc.ts",
+    "./lixin/common/error/v1/error": "./lixin/common/error/v1/error.ts",
+    "./lixin/common/error/v1/error.enum": "./lixin/common/error/v1/error.enum.ts",
+    "./v1/rpc": "./lixin/common/error/v1/rpc.ts",
+    "./v1/error": "./lixin/common/error/v1/error.ts",
+    "./v1/error.enum": "./lixin/common/error/v1/error.enum.ts"
+  },
+  "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "typesVersions": {
+    "*": {
+      "./lixin/common/error/v1/rpc": [
+        "lixin/common/error/v1/rpc.ts"
+      ],
+      "./lixin/common/error/v1/error": [
+        "lixin/common/error/v1/error.ts"
+      ],
+      "./lixin/common/error/v1/error.enum": [
+        "lixin/common/error/v1/error.enum.ts"
+      ],
+      "./v1/rpc": [
+        "lixin/common/error/v1/rpc.ts"
+      ],
+      "./v1/error": [
+        "lixin/common/error/v1/error.ts"
+      ],
+      "./v1/error.enum": [
+        "lixin/common/error/v1/error.enum.ts"
+      ]
+    }
+  },
+  "dependencies": {}
+}
