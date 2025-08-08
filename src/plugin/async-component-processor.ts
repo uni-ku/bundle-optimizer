@@ -153,7 +153,7 @@ export function AsyncComponentProcessor(options: DtsType, enableLogger: boolean)
             type: 'asset',
             name: key,
             fileName: `${key}.json`,
-            source: JSON.stringify({ usingComponents, componentPlaceholder }, null, 2),
+            source: JSON.stringify(Object.assign({}, cache, { usingComponents, componentPlaceholder }), null, 2),
           } as typeof bundle.__proto__
         }
       })
