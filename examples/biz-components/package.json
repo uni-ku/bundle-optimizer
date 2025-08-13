@@ -1,0 +1,22 @@
+{
+  "name": "biz-components",
+  "version": "1.0.0",
+  "description": "components example",
+  "author": "",
+  "license": "ISC",
+  "keywords": [],
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "peerDependencies": {
+    "@dcloudio/uni-app": "catalog:uniapp",
+    "@dcloudio/uni-components": "catalog:uniapp",
+    "@dcloudio/uni-h5": "catalog:uniapp",
+    "@dcloudio/uni-mp-weixin": "catalog:uniapp",
+    "vue": "catalog:uniapp"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "catalog:uniapp"
+  }
+}

@@ -9,22 +9,24 @@
     "build:mp-weixin": "uni build -p mp-weixin"
   },
   "dependencies": {
-    "@dcloudio/uni-app": "3.0.0-4020820240925001",
-    "@dcloudio/uni-components": "3.0.0-4020820240925001",
-    "@dcloudio/uni-h5": "3.0.0-4020820240925001",
-    "@dcloudio/uni-mp-weixin": "3.0.0-4020820240925001",
+    "@dcloudio/uni-app": "catalog:uniapp",
+    "@dcloudio/uni-components": "catalog:uniapp",
+    "@dcloudio/uni-h5": "catalog:uniapp",
+    "@dcloudio/uni-mp-weixin": "catalog:uniapp",
     "@https-enable/colors": "^0.1.1",
-    "lodash": "^4.17.21",
-    "vue": "3.4.21",
-    "@lixin-sdk/common-error-http-sdk": "workspace:*"
+    "@lixin-sdk/common-error-http-sdk": "workspace:*",
+    "biz-components": "workspace:*",
+    "lodash": "catalog:",
+    "vue": "catalog:uniapp"
   },
   "devDependencies": {
-    "@dcloudio/types": "^3.4.10",
-    "@dcloudio/uni-automator": "3.0.0-4020820240925001",
-    "@dcloudio/uni-cli-shared": "3.0.0-4020820240925001",
-    "@dcloudio/vite-plugin-uni": "3.0.0-4020820240925001",
+    "@dcloudio/types": "catalog:uniapp",
+    "@dcloudio/uni-automator": "catalog:uniapp",
+    "@dcloudio/uni-cli-shared": "catalog:uniapp",
+    "@dcloudio/vite-plugin-uni": "catalog:uniapp",
     "@https-enable/types": "^0.1.1",
-    "@types/lodash": "^4.17.13",
+    "@types/lodash": "catalog:",
+    "@uni-helper/vite-plugin-uni-components": "^0.2.0",
     "@uni-ku/bundle-optimizer": "workspace:*"
   }
 }
