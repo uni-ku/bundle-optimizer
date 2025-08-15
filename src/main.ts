@@ -94,12 +94,6 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
       return !subPackageRoots.some(root => moduleIdProcessor(item).indexOf(root) === 0)
     })
   }
-  /** 判断是否有来自`node_modules`下的依赖 */
-  const hasNodeModules = function (importers: readonly string[]) {
-    return hasNoSubPackage(importers) && importers.some((item) => {
-      return moduleIdProcessor(item).includes('node_modules')
-    })
-  }
   /** 查找来自 主包 下的依赖 */
   const findMainPackage = function (importers: readonly string[]) {
     const list = importers.filter((item) => {
@@ -109,6 +103,24 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
     })
     return list
   }
+  /** 查找`node_modules`下的三方依赖 */
+  const findNodeModules = function (importers: readonly string[]) {
+    const mainPackageList = findMainPackage(importers)
+    return importers.filter((item) => {
+      const id = moduleIdProcessor(item)
+      // 排除主包和子包，并且包含“node_modules”
+      return !mainPackageList.includes(item) && !subPackageRoots.some(root => id.indexOf(root) === 0) && id.includes('node_modules')
+    })
+  }
+  /** 查找三方依赖的组件库 */
+  const findNodeModulesComponent = function (importers: readonly string[]) {
+    const list = findNodeModules(importers)
+    const nodeModulesComponent = new Set(list
+      .map(item => moduleIdProcessor(item))
+      .filter(name => name.endsWith('.vue') || name.endsWith('.nvue')))
+    return nodeModulesComponent
+  }
+
   /** 查找来自 主包 下的组件 */
   const findMainPackageComponent = function (importers: readonly string[]) {
     const list = findMainPackage(importers)
@@ -266,10 +278,12 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
             const newMatchSubPackages = findSubPackages(importersGraph)
             // 查找引用图谱中是否有主包的组件文件模块
             const newMainPackageComponent = findMainPackageComponent(importersGraph)
+            // 查找三方依赖组件库
+            const nodeModulesComponent = findNodeModulesComponent(importersGraph)
             isEntry = hasEntryFile(importersGraph, meta)
 
-            // 引用图谱中只找到一个子包的引用，并且没有出现主包的组件以及入口文件(main.{ts|js})，则说明只归属该子包
-            if (!isEntry && newMatchSubPackages.size === 1 && newMainPackageComponent.size === 0) {
+            // 引用图谱中只找到一个子包的引用，并且没有出现主包的组件以及入口文件(main.{ts|js})，且没有被三方组件库引用，则说明只归属该子包
+            if (!isEntry && newMatchSubPackages.size === 1 && newMainPackageComponent.size === 0 && nodeModulesComponent.size === 0) {
               return `${newMatchSubPackages.values().next().value}common/vendor`
             }
             // #endregion

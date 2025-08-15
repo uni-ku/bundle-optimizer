@@ -7,6 +7,7 @@ import { MathUtils } from '@/lib/demo'
 import cloneDeep from 'lodash/cloneDeep'
 import demo from '@/api/test'
 import { getErrorReasonStrValue } from '@/lib/ajax-grpc'
+import { testUtil } from 'biz-components/utils'
 
 demo('sub')
 
@@ -20,6 +21,7 @@ const asyncComponent = shallowRef<any>()
 
 onMounted(async () => {
   console.log(getErrorReasonStrValue());
+  console.log(testUtil('111'));
 
   AsyncImport('@/pages-sub-async/plugin').then((res) => {
     res.AsyncPluginDemo().run()

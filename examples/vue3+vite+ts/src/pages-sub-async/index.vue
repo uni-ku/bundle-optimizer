@@ -31,6 +31,7 @@ onMounted(() => {
   <view class="center">
     pages-sub-async
   </view>
+  <biz-test />
   <button @click="refresh">
     刷新
   </button>
