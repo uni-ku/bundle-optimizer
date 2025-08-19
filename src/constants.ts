@@ -1,6 +1,10 @@
 import process from 'node:process'
 
-export const EXTNAME_JS_RE = /\.(js|jsx|ts|uts|tsx|mjs)$/
+/**
+ * `js`|`jsx`|`ts`|`uts`|`tsx`|`mjs`|`json`
+ * @description json 文件会被处理成 js 模块
+ */
+export const EXTNAME_JS_RE = /\.(js|jsx|ts|uts|tsx|mjs|json)$/
 export const JS_TYPES_RE = /\.(?:j|t)sx?$|\.mjs$/
 
 export const knownJsSrcRE

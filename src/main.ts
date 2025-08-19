@@ -7,8 +7,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { parseManifestJsonOnce, parseMiniProgramPagesJson } from '@dcloudio/uni-cli-shared'
 import { logger } from './common/Logger'
-import { EXTNAME_JS_RE, ROOT_DIR } from './constants'
-import { moduleIdProcessor as _moduleIdProcessor, normalizePath } from './utils'
+import { EXTNAME_JS_RE, knownJsSrcRE, ROOT_DIR } from './constants'
+import { moduleIdProcessor as _moduleIdProcessor, normalizePath, parseQuerystring } from './utils'
 
 /**
  * uniapp 分包优化插件
@@ -30,6 +30,17 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
   const pagesJsonPath = path.resolve(inputDir, 'pages.json')
   const jsonStr = fs.readFileSync(pagesJsonPath, 'utf8')
   const { appJson } = parseMiniProgramPagesJson(jsonStr, platform, { subpackages: true })
+
+  const pagesFlat = {
+    pages: appJson.pages || [],
+    subPackages: (appJson.subPackages || []).flatMap((pkg) => {
+      return pkg.pages.map(item => [pkg.root, item].map(item => item.split('/').filter(Boolean)).join('/'))
+    }),
+    get all() {
+      return [...this.pages, ...this.subPackages]
+    },
+  }
+
   process.UNI_SUBPACKAGES = appJson.subPackages || {}
   // #endregion
 
@@ -48,8 +59,8 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
    * # id处理器
    * @description 将id中的moduleId转换为相对于inputDir的路径并去除查询参数后缀
    */
-  function moduleIdProcessor(id: string) {
-    return _moduleIdProcessor(id, process.env.UNI_INPUT_DIR)
+  function moduleIdProcessor(id: string, removeQuery = true) {
+    return _moduleIdProcessor(id, process.env.UNI_INPUT_DIR, removeQuery)
   }
   /**
    * 判断该文件模块的来源
@@ -165,6 +176,20 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
     }
     return false
   }
+
+  /** 判断模块是否是一个 vue 文件的 script 函数模块 */
+  const isVueScript = (moduleInfo: Partial<ModuleInfo>) => {
+    if (!moduleInfo.id || !moduleInfo.importers?.length) {
+      return false
+    }
+    const importer = moduleIdProcessor(moduleInfo.importers[0])
+    const id = moduleInfo.id
+    const clearId = moduleIdProcessor(id, false)
+
+    const parsedUrl = parseQuerystring(clearId)
+
+    return parsedUrl && parsedUrl.type === 'script' && parsedUrl.vue && importer === moduleIdProcessor(id)
+  }
   // #endregion
 
   logger.info('[optimization] 分包优化插件已启用', !enableLogger)
@@ -195,7 +220,7 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
           const visited = new Set<string>()
           const result: string[] = []
 
-          // 支持自定义遍历方向的泛化实现
+          // 支持自定义遍历方向
           function traverse(
             currentId: string,
             getRelated: (info: ModuleInfo) => readonly string[], // 控制遍历方向的回调函数
@@ -215,7 +240,7 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
             })
           }
 
-          // 示例：向上追踪 importers（谁导入了当前模块）
+          // 默认：向上追踪 importers（谁导入了当前模块）
           traverse(startId, getRelated)
 
           // 若需要向下追踪 dependencies（当前模块导入了谁）：
@@ -227,73 +252,65 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
         const normalizedId = normalizePath(id)
         const filename = normalizedId.split('?')[0]
 
+        let mainFlag: false | string = false
+
         // #region ⚠️ 以下代码是分包优化的核心逻辑
-        // 处理项目内的js,ts文件
-        if (EXTNAME_JS_RE.test(filename) && (filename.startsWith(inputDir) || filename.includes('node_modules'))) {
+        // 处理项目内的js,ts文件 | 兼容 json 文件，import json 会被处理成 js 模块
+        if (EXTNAME_JS_RE.test(filename) && (filename.startsWith(normalizePath(inputDir)) || filename.includes('node_modules'))) {
           // 如果这个资源只属于一个子包，并且其调用组件的不存在跨包调用的情况，那么这个模块就会被加入到对应的子包中。
           const moduleInfo = meta.getModuleInfo(id)
           if (!moduleInfo) {
             throw new Error(`moduleInfo is not found: ${id}`)
           }
-          const importers = moduleInfo.importers || [] // 依赖当前模块的模块id
-          const matchSubPackages = findSubPackages(importers)
-          // 查找直接引用关系中是否有主包的组件文件模块
-          const mainPackageComponent = findMainPackageComponent(importers)
+
+          const importersGraph = getDependencyGraph(id) // 搜寻引用图谱
+          const newMatchSubPackages = findSubPackages(importersGraph)
+          // 查找引用图谱中是否有主包的组件文件模块
+          const newMainPackageComponent = findMainPackageComponent(importersGraph)
+          // 查找三方依赖组件库
+          const nodeModulesComponent = findNodeModulesComponent(importersGraph)
           /**
            * 是否有被项目入口文件直接引用
            */
-          let isEntry = hasEntryFile(importers, meta)
+          const isEntry = hasEntryFile(importersGraph, meta)
 
-          const moduleFromInfos = moduleFrom(id)
-
-          let isMain = false
-          if (
-            // 未知来源的模块、commonjsHelpers => 打入主包
-            (!moduleFromInfos || moduleFromInfos.clearId === 'commonjsHelpers.js')
-            // 被入口文件直接引用的 => 打入主包
-            || isEntry
-            // 主包未被引用的模块 => 打入主包（要么是项目主入口文件、要么就是存在隐式引用）
-            // 主包没有匹配到子包的引用 => 打入主包（只被主包引用）
-            || (moduleFromInfos.from === 'main' && (!importers.length || !matchSubPackages.size))
-            // 直系（浅层）依赖判断：匹配到存在主包组件的引用
-            || mainPackageComponent.size > 0
-            // 直系（浅层）依赖判断：匹配到多个子包的引用 => 打入主包
-            || matchSubPackages.size > 1
-          ) {
-            // 这里使用 flag 控制，而不能使用 return
-            // 直接 return 和 return "common/vendor" 都是不对的
-            // 直接放空，让后续的插件自行抉择
-            isMain = true
+          // 引用图谱中只找到一个子包的引用，并且没有出现主包的组件以及入口文件(main.{ts|js})，且没有被三方组件库引用，则说明只归属该子包
+          if (!isEntry && newMatchSubPackages.size === 1 && newMainPackageComponent.size === 0 && nodeModulesComponent.size === 0) {
+            return `${newMatchSubPackages.values().next().value}common/vendor`
           }
-
-          if (!isMain) {
-            // 直系（浅层）判断 => 打入子包（必须判断是否有没有非子包的引用的模块，因为暂时无法判断第三方的模块的依赖链的情况）
-            if (matchSubPackages.size === 1 && !hasNoSubPackage(importers)) {
-              return `${matchSubPackages.values().next().value}common/vendor`
-            }
-
-            // #region 👋 此处的逻辑完全可以取代前面的所有分支判断
-            // 但是保留前面的过程，是因为当前逻辑是耗时的，提前通过一些浅显的判断判定引用结果
-            const importersGraph = getDependencyGraph(id) // 搜寻引用图谱
-            const newMatchSubPackages = findSubPackages(importersGraph)
-            // 查找引用图谱中是否有主包的组件文件模块
-            const newMainPackageComponent = findMainPackageComponent(importersGraph)
-            // 查找三方依赖组件库
-            const nodeModulesComponent = findNodeModulesComponent(importersGraph)
-            isEntry = hasEntryFile(importersGraph, meta)
-
-            // 引用图谱中只找到一个子包的引用，并且没有出现主包的组件以及入口文件(main.{ts|js})，且没有被三方组件库引用，则说明只归属该子包
-            if (!isEntry && newMatchSubPackages.size === 1 && newMainPackageComponent.size === 0 && nodeModulesComponent.size === 0) {
-              return `${newMatchSubPackages.values().next().value}common/vendor`
-            }
-            // #endregion
-          }
+          mainFlag = id
         }
         // #endregion
 
         // 调用已有的 manualChunks 配置 ｜ 此处必须考虑到原有的配置，是为了使 uniapp 原本的分包配置生效
-        if (existingManualChunks && typeof existingManualChunks === 'function')
-          return existingManualChunks(id, meta)
+        if (existingManualChunks && typeof existingManualChunks === 'function') {
+          const result = existingManualChunks(id, meta)
+
+          if (result === undefined) {
+            const moduleInfo = meta.getModuleInfo(id)
+
+            if (moduleInfo) {
+              const clearId = moduleIdProcessor(moduleInfo.id)
+
+              if (mainFlag === id && !moduleInfo.isEntry && !findNodeModules([moduleInfo.id]).length) {
+                logger.info(`[optimization] 主包内容强制落盘: ${clearId}`)
+                return clearId
+              }
+
+              // TODO: 绝对路径是 monorepo 项目结构下的三方依赖库的特点，这里暂时不做处理
+              if (isVueScript(moduleInfo) && !path.isAbsolute(clearId)) {
+                const target = clearId.replace(knownJsSrcRE, '')
+                // 规整没处理好的 vue 组件的 script 模块的去处
+                if (!pagesFlat.all.includes(target)) {
+                  logger.info(`[optimization] 规整 vue-script 模块: ${target} -> ${target}-vendor`)
+                  return `${target}-vendor`
+                }
+              }
+            }
+          }
+
+          return result
+        }
       }
 
       return {

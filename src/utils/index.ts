@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
+import querystring from 'query-string'
 import { ASSETS_DIR_RE, EXT_RE, ROOT_DIR, SRC_DIR_RE } from '../constants'
 
 /** 替换字符串指定位置的字符 */
@@ -47,14 +48,14 @@ export function ensureDirectoryExists(filePath: string) {
 }
 
 /** 路径处理器 | 去除`rootDir`前缀路径和查询参数 | `rootDir`默认为项目根目录 */
-export function moduleIdProcessor(id: string, rootDir = ROOT_DIR) {
+export function moduleIdProcessor(id: string, rootDir = ROOT_DIR, removeQuery = true) {
   rootDir = normalizePath(rootDir)
   // 确保 rootDir 以斜杠结尾
   if (!rootDir.endsWith('/'))
     rootDir += '/'
 
   const normalized = normalizePath(id)
-  const name = normalized.split('?')[0]
+  const name = removeQuery ? normalized.split('?')[0] : normalized
   // 从name中剔除 rootDir 前缀
   const updatedName = name.replace(rootDir, '')
 
@@ -127,6 +128,36 @@ export function findFirstNonConsecutiveBefore(arr: number[]): number | null {
 /** 明确的 bool 型做取反，空值原样返回 */
 export function toggleBoolean(value: boolean | undefined | null) {
   return typeof value === 'boolean' ? !value : value
+}
+
+/**
+ * 解析 URL 查询字符串
+ * @param url 待解析的 URL 字符串（必须包含 `?`）
+ * @returns 解析后的查询参数对象
+ */
+export function parseQuerystring(url?: any) {
+  if (!url || typeof url !== 'string') {
+    return null
+  }
+
+  const rmExtUrl = url.replace(EXT_RE, '')
+  const queryStr = rmExtUrl.split('?')[1] || ''
+  // 此处表明函数入参的字符串必须包含 '?'
+  if (!queryStr) {
+    return null
+  }
+
+  try {
+    return Object.entries(querystring.parse(queryStr, { parseBooleans: true }))
+      .reduce((acc, [key, value]) => {
+        acc[key] = value === null ? true : value
+        return acc
+      }, {} as Record<string, string | boolean | (string | boolean | null)[]>)
+  }
+  catch (error) {
+    console.error('Error parsing query string:', error)
+    return null
+  }
 }
 
 export * from './getViteConfigPaths'

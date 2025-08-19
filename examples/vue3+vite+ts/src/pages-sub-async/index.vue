@@ -3,7 +3,8 @@
 import { onMounted, ref } from 'vue'
 import groupBy from 'lodash/groupBy'
 import cloneDeep from 'lodash/cloneDeep'
-import { MathUtils } from "@/lib/demo"
+import { MathUtils } from '@/lib/demo'
+import { getSubPackages } from '@/lib/pages'
 
 /** 刷新页面 */
 function refresh() {
@@ -24,6 +25,7 @@ onMounted(() => {
     }, 1000)
   })
   console.log(MathUtils.add(1, 1), cloneDeep({}));
+  console.log(getSubPackages());
 })
 </script>
 

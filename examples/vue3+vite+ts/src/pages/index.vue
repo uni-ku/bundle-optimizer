@@ -2,7 +2,8 @@
 import SubComponent from '@/pages-sub-async/component.vue?async'
 import SubDemo from '@/pages-sub-demo/index.vue?async'
 import { onMounted } from 'vue'
-import { getMainPackageTestApi } from "@/api";
+import { getMainPackageTestApi } from '@/api'
+import { getPages } from '@/lib/pages'
 
 function goDemoSubPage() {
   uni.navigateTo({
@@ -12,6 +13,7 @@ function goDemoSubPage() {
 
 onMounted(async () => {
   getMainPackageTestApi("主包 api 请求模拟")
+  console.log(getPages())
 })
 </script>
 

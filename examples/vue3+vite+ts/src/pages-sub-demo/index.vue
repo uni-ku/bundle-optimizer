@@ -8,6 +8,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import demo from '@/api/test'
 import { getErrorReasonStrValue } from '@/lib/ajax-grpc'
 import { testUtil } from 'biz-components/utils'
+import DemoComponent from './components/demo1.vue'
 
 demo('sub')
 
@@ -55,7 +56,8 @@ onMounted(async () => {
       <component :is="asyncComponent"></component>
       <!-- #endif -->
       <!-- #ifdef MP -->
-      <view style="background-color: gray;color: aliceblue;font-size: small;padding: 16rpx;margin: 16rpx;">小程序端无法动态渲染远程组件</view>
+      <!-- <view style="background-color: gray;color: aliceblue;font-size: small;padding: 16rpx;margin: 16rpx;">小程序端无法动态渲染远程组件</view> -->
+       <DemoComponent />
       <!-- #endif -->
     </view>
   </view>

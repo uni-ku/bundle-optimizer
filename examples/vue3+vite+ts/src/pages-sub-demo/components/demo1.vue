@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
+import pagesTest from 'biz-components/utils/pages-test'
+
 function openConfirm(msg: string, data: { name: string }) {
   uni.showToast({ title: msg, icon: 'none' })
 }
@@ -29,6 +31,12 @@ const getBtns = (item: { status: number }) => {
     },
   ]
 }
+
+pagesTest.test()
+uniCloud.init({
+  provider: 'tencent',
+  spaceId: ''
+})
 </script>
 
 <template>
