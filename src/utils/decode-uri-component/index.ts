@@ -78,6 +78,10 @@ function customDecodeURIComponent(input: string) {
   return input
 }
 
+/**
+ *
+ * @link https://github.com/SamVerschueren/decode-uri-component
+ */
 export function decodeUriComponent(encodedURI: unknown) {
   if (typeof encodedURI !== 'string') {
     throw new TypeError(`Expected \`encodedURI\` to be of type \`string\`, got \`${typeof encodedURI}\``)
