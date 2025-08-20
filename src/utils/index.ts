@@ -1,8 +1,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
-import querystring from 'query-string'
 import { ASSETS_DIR_RE, EXT_RE, ROOT_DIR, SRC_DIR_RE } from '../constants'
+import * as querystring from './query-string'
 
 /** 替换字符串指定位置的字符 */
 export function replaceStringAtPosition(originalStr: string, start: number, end: number, replaceWith: string) {
@@ -148,9 +148,9 @@ export function parseQuerystring(url?: any) {
   }
 
   try {
-    return Object.entries(querystring.parse(queryStr, { parseBooleans: true }))
+    return Object.entries(querystring.parse(queryStr))
       .reduce((acc, [key, value]) => {
-        acc[key] = value === null ? true : value
+        acc[key] = value === null || value === 'true' ? true : value === 'false' ? false : value
         return acc
       }, {} as Record<string, string | boolean | (string | boolean | null)[]>)
   }
