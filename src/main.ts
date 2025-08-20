@@ -34,7 +34,7 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
   const pagesFlat = {
     pages: appJson.pages || [],
     subPackages: (appJson.subPackages || []).flatMap((pkg) => {
-      return pkg.pages.map(item => [pkg.root, item].map(item => item.split('/').filter(Boolean)).join('/'))
+      return pkg.pages.map(page => `${pkg.root}/${page}`.replace(/\/{2,}/g, '/'))
     }),
     get all() {
       return [...this.pages, ...this.subPackages]
