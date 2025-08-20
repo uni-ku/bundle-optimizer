@@ -293,7 +293,7 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
               const clearId = moduleIdProcessor(moduleInfo.id)
 
               if (mainFlag === id && !moduleInfo.isEntry && !findNodeModules([moduleInfo.id]).length) {
-                logger.info(`[optimization] 主包内容强制落盘: ${clearId}`)
+                logger.info(`[optimization] 主包内容强制落盘: ${clearId}`, !enableLogger)
                 return clearId
               }
 
@@ -302,7 +302,7 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
                 const target = clearId.replace(knownJsSrcRE, '')
                 // 规整没处理好的 vue 组件的 script 模块的去处
                 if (!pagesFlat.all.includes(target)) {
-                  logger.info(`[optimization] 规整 vue-script 模块: ${target} -> ${target}-vendor`)
+                  logger.info(`[optimization] 规整 vue-script 模块: ${target} -> ${target}-vendor`, !enableLogger)
                   return `${target}-vendor`
                 }
               }
