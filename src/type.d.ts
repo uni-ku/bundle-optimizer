@@ -81,4 +81,10 @@ export interface IOptions {
    * log 控制，默认不启用，为false
    */
   logger?: Prettify<boolean | Enable[]>
+  /**
+   * 日志落盘
+   * ---
+   * 如果启用则会在 `node_modules/.cache/[项目名称]` 下生成 `logs.log` 日志文件, 也可以传入字符串自定义日志文件路径、名称
+   */
+  logToFile?: boolean | string
 }

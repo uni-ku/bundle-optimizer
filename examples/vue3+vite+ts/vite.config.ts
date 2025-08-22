@@ -33,6 +33,7 @@ export default defineConfig({
         },
       },
       logger: true,
+      logToFile: true,
     }),
     UniComponents({
       dts: 'src/types/components.d.ts',

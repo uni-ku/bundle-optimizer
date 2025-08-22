@@ -41,6 +41,8 @@ export function SubPackagesOptimization(enableLogger: boolean): Plugin {
     },
   }
 
+  logger.info(`pagesFlat: ${JSON.stringify(pagesFlat, null, 2)}`, false)
+
   process.UNI_SUBPACKAGES = appJson.subPackages || {}
   // #endregion
 
@@ -276,6 +278,7 @@ export function SubPackagesOptimization(enableLogger: boolean): Plugin {
 
           // 引用图谱中只找到一个子包的引用，并且没有出现主包的组件以及入口文件(main.{ts|js})，且没有被三方组件库引用，则说明只归属该子包
           if (!isEntry && newMatchSubPackages.size === 1 && newMainPackageComponent.size === 0 && nodeModulesComponent.size === 0) {
+            logger.info(`[optimization] 子包: ${[...newMatchSubPackages].join(', ')} <- ${filename}`, !enableLogger)
             return `${newMatchSubPackages.values().next().value}common/vendor`
           }
           mainFlag = id
@@ -309,6 +312,7 @@ export function SubPackagesOptimization(enableLogger: boolean): Plugin {
             }
           }
 
+          logger.warn(`[optimization] default: ${result} <- ${id}`, !enableLogger)
           return result
         }
       }

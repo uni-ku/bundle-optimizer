@@ -15,6 +15,7 @@ export class Logger {
   private Debugger = null
   /** 全局兜底：是否是隐式log */
   private isImplicit: boolean
+  public onLog?: (context: string, level: `${LogLevel}`, message: string, timestamp: number) => void
 
   constructor(level: LogLevel = LogLevel.INFO, context: string = 'Plugin', isImplicit = false) {
     this.level = level
@@ -25,6 +26,7 @@ export class Logger {
   private log(level: LogLevel, message: string, isImplicit?: boolean) {
     if (this.shouldLog(level)) {
       const coloredMessage = this.getColoredMessage(level, message)
+      this.onLog?.(this.context, level, message, Date.now())
       if (isImplicit ?? this.isImplicit) {
         // TODO: 相关的隐式log，需要通过外部环境变量启用
         // 此处暂时不显示
