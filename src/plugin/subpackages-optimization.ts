@@ -41,7 +41,7 @@ export function SubPackagesOptimization(enableLogger: boolean): Plugin {
     },
   }
 
-  logger.info(`pagesFlat: ${JSON.stringify(pagesFlat, null, 2)}`, false)
+  logger.info(`pagesFlat: ${JSON.stringify(pagesFlat, null, 2)}`, true)
 
   process.UNI_SUBPACKAGES = appJson.subPackages || {}
   // #endregion
