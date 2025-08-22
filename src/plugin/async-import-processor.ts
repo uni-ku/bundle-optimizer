@@ -188,6 +188,8 @@ export function AsyncImportProcessor(options: DtsType, enableLogger: boolean): P
   }
 }
 
+export default AsyncImportProcessor
+
 /**
  * 生成类型定义
  */

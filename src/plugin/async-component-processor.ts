@@ -166,6 +166,8 @@ export function AsyncComponentProcessor(options: DtsType, enableLogger: boolean)
   }
 }
 
+export default AsyncComponentProcessor
+
 /**
  * 生成类型定义
  */

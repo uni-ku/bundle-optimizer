@@ -1,9 +1,9 @@
 import type { PluginOption } from 'vite'
 import type { IOptions } from './type'
-import AsyncComponent from './async-component'
-import AsyncImport from './async-import'
 import { ParseOptions } from './common/ParseOptions'
-import UniappSubPackagesOptimization from './main'
+import AsyncComponentProcessor from './plugin/async-component-processor'
+import AsyncImportProcessor from './plugin/async-import-processor'
+import SubPackagesOptimization from './plugin/subpackages-optimization'
 import { initializeVitePathResolver } from './utils'
 
 export default (options: IOptions = {}): PluginOption => {
@@ -17,11 +17,13 @@ export default (options: IOptions = {}): PluginOption => {
       },
     },
     // 分包优化
-    parse.enable.optimization && UniappSubPackagesOptimization(parse.logger.optimization),
+    parse.enable.optimization && SubPackagesOptimization(parse.logger.optimization),
     // js/ts插件的异步调用
-    parse.enable['async-import'] && AsyncImport(parse.dts['async-import'], parse.logger['async-import']),
+    // 处理 `AsyncImport` 函数调用的路径传参
+    parse.enable['async-import'] && AsyncImportProcessor(parse.dts['async-import'], parse.logger['async-import']),
     // vue组件的异步调用
-    parse.enable['async-component'] && AsyncComponent(parse.dts['async-component'], parse.logger['async-component']),
+    // 处理 `.vue?async` 查询参数的静态导入
+    parse.enable['async-component'] && AsyncComponentProcessor(parse.dts['async-component'], parse.logger['async-component']),
   ]
 }
 

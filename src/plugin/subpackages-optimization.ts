@@ -2,18 +2,18 @@
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable node/prefer-global/process */
 import type { Plugin } from 'vite'
-import type { ISubPkgsInfo, ManualChunkMeta, ManualChunksOption, ModuleInfo } from './type'
+import type { ISubPkgsInfo, ManualChunkMeta, ManualChunksOption, ModuleInfo } from '../type'
 import fs from 'node:fs'
 import path from 'node:path'
 import { parseManifestJsonOnce, parseMiniProgramPagesJson } from '@dcloudio/uni-cli-shared'
-import { logger } from './common/Logger'
-import { EXTNAME_JS_RE, knownJsSrcRE, ROOT_DIR } from './constants'
-import { moduleIdProcessor as _moduleIdProcessor, normalizePath, parseQuerystring } from './utils'
+import { logger } from '../common/Logger'
+import { EXTNAME_JS_RE, knownJsSrcRE, ROOT_DIR } from '../constants'
+import { moduleIdProcessor as _moduleIdProcessor, normalizePath, parseQuerystring } from '../utils'
 
 /**
  * uniapp 分包优化插件
  */
-export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
+export function SubPackagesOptimization(enableLogger: boolean): Plugin {
   const platform = process.env.UNI_PLATFORM
   const inputDir = process.env.UNI_INPUT_DIR
 
@@ -326,4 +326,4 @@ export function UniappSubPackagesOptimization(enableLogger: boolean): Plugin {
   }
 }
 
-export default UniappSubPackagesOptimization
+export default SubPackagesOptimization
