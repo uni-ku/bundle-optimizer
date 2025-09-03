@@ -14,7 +14,7 @@ function refresh() {
 }
 
 const result = ref<any>(null)
-onMounted(() => {
+onMounted(async () => {
   AsyncImport('@/pages-sub-async/plugin').then((res) => {
     res.AsyncPluginDemo().run()
   })
@@ -23,6 +23,9 @@ onMounted(() => {
     setTimeout(() => {
       result.value = res.default
     }, 1000)
+  })
+  await AsyncImport('@/pages-sub-async/plugin').then((res) => {
+    res.AsyncPluginDemo().run()
   })
   console.log(MathUtils.add(1, 1), cloneDeep({}));
   console.log(getSubPackages());
