@@ -2,6 +2,7 @@
 
 [![NPM downloads](https://img.shields.io/npm/dm/@uni-ku/bundle-optimizer?label=downloads)](https://www.npmjs.com/package/@uni-ku/bundle-optimizer)
 [![LICENSE](https://img.shields.io/github/license/uni-ku/bundle-optimizer?style=flat&label=license)](https://github.com/uni-ku/bundle-optimizer#readme)
+[![pkg.pr.new](https://pkg.pr.new/badge/uni-ku/bundle-optimizer?style=flat&color=000&logoSize=auto)](https://pkg.pr.new/~/uni-ku/bundle-optimizer)
 
 > [!TIP]
 > uni-app 分包优化插件化实现
