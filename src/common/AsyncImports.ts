@@ -6,7 +6,7 @@ export class AsyncImports {
     if (this.cache.has(id) && !this.cache.get(id)?.includes(value)) {
       this.cache.get(id)?.push(value)
     }
-    else {
+    else if (!this.cache.has(id)) {
       this.cache.set(id, [value])
     }
 
