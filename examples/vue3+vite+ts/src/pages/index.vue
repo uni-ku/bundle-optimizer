@@ -21,7 +21,7 @@ onMounted(async () => {
   <view class="center">
     uniapp 分包优化
   </view>
-
+    <biz-use-test />
   <button @click="goDemoSubPage">
     前往子包
   </button>

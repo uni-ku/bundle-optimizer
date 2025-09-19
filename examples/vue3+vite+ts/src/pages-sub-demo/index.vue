@@ -42,7 +42,7 @@ onMounted(async () => {
     <view class="center">
       子包页面
     </view>
-    <biz-test />
+    <biz-use-test />
     <view class="center lighter padding-0">
       <text>------</text>
       <SubComponent />
