@@ -13,6 +13,8 @@ import { logger } from '../common/Logger'
 import { ROOT_DIR } from '../constants'
 import { calculateRelativePath, ensureDirectoryExists, findFirstNonConsecutiveBefore, getVitePathResolver, kebabCase, lexDefaultImportWithQuery, lexFunctionCalls, normalizePath } from '../utils'
 
+export const AsyncComponentsInstance = new AsyncComponents()
+
 /**
  * 处理 `import xxx from "*.vue?async"` 形式的调用
  * @description `transform`阶段处理识别以上形式的导入语句，做相关的缓存处理；并将`?async`查询参数去除，避免后续编译处理识别不来该语句
@@ -21,7 +23,6 @@ import { calculateRelativePath, ensureDirectoryExists, findFirstNonConsecutiveBe
 export function AsyncComponentProcessor(options: DtsType, enableLogger: boolean): Plugin {
   const inputDir = process.env.UNI_INPUT_DIR
   const platform = process.env.UNI_PLATFORM
-  const AsyncComponentsInstance = new AsyncComponents()
 
   const isMP = platform?.startsWith('mp-')
 
@@ -81,13 +82,13 @@ export function AsyncComponentProcessor(options: DtsType, enableLogger: boolean)
             // ---- 记录异步组件 [小程序环境下] ----
             if (isMP) {
               const url = modulePath.value.toString()
-              let normalizedPath = getVitePathResolver()(url, true)
+              const realPath = getVitePathResolver()(url, true)
               // 根据调用主从关系，获取引用文件的相对路径
-              normalizedPath = calculateRelativePath(importer, normalizedPath)
+              let normalizedPath = calculateRelativePath(importer, realPath)
               // 去除 .vue 后缀
               normalizedPath = normalizedPath.replace(/\.vue$/, '')
               const tag = kebabCase(defaultVariable.value.toString())
-              tempBindings[tag] = AsyncComponentsInstance.generateBinding(tag, normalizedPath)
+              tempBindings[tag] = AsyncComponentsInstance.generateBinding(tag, normalizedPath, realPath)
             }
             // ---- 记录异步组件 | 其他步骤是全平台的都要的，因为在 transform 阶段需要把 `import xxx from "*.vue?async"` 查询参数去除，否则会影响后续编译 ----
           }

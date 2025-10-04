@@ -3,6 +3,7 @@ export type BindingAsyncComponents = Record<string, {
   tag: string
   value: string
   type: 'asyncComponent'
+  path: string
 }>
 
 export interface TemplateDescriptor {
@@ -29,8 +30,8 @@ export class AsyncComponents {
     this.jsonAsyncComponentsCache.set(filename, json)
   }
 
-  generateBinding(tag: string, path: string) {
-    return { tag, value: path, type: 'asyncComponent' } as const
+  generateBinding(tag: string, path: string, realPath: string) {
+    return { tag, value: path, type: 'asyncComponent', path: realPath } as const
   }
 
   getComponentPlaceholder(filename: string) {
