@@ -113,7 +113,7 @@ export function AsyncImportProcessor(options: DtsType, enableLogger: boolean): P
           let moduleId = chunk.facadeModuleId ?? undefined
 
           if (moduleId?.startsWith('uniPage://') || moduleId?.startsWith('uniComponent://')) {
-            const moduleIds = chunk.moduleIds.filter(id => id !== moduleId).map(id => moduleIdProcessor(id))
+            const moduleIds = chunk.moduleIds?.filter(id => id !== moduleId).map(id => moduleIdProcessor(id)) ?? []
             if (moduleIds.length >= 1 && moduleIds.length < chunk.moduleIds.length) {
               moduleId = moduleIds.at(-1)
             }
@@ -128,8 +128,7 @@ export function AsyncImportProcessor(options: DtsType, enableLogger: boolean): P
           }
           else {
             // 处理其他的文件的hash化路径映射情况
-            const temp = chunk.moduleIds.filter(id =>
-              !id.startsWith('\x00'))
+            const temp = chunk.moduleIds?.filter(id => !id.startsWith('\x00')) ?? []
             temp.forEach((id) => {
               acc[moduleIdProcessor(id)] = chunk.fileName
             })
