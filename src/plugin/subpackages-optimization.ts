@@ -302,10 +302,13 @@ export function SubPackagesOptimization(enableLogger: boolean): Plugin {
 
               // TODO: 绝对路径是 monorepo 项目结构下的三方依赖库的特点，这里暂时不做处理
               if (isVueScript(moduleInfo) && !path.isAbsolute(clearId)) {
-                const target = clearId.replace(knownJsSrcRE, '')
+                const originalTarget = clearId.replace(knownJsSrcRE, '')
                 // 规整没处理好的 vue 组件的 script 模块的去处
-                if (!pagesFlat.all.includes(target)) {
-                  logger.info(`[optimization] 规整 vue-script 模块: ${target} -> ${target}-vendor`, !enableLogger)
+                if (!pagesFlat.all.includes(originalTarget)) {
+                  // uniapp 会将三方库落盘路径 node_modules 改为 node-modules
+                  // TODO: 需要对此类业务总结、抽离
+                  const target = originalTarget.replace(/^(\.?\/)?node_modules\//, 'node-modules/')
+                  logger.info(`[optimization] 规整 vue-script 模块: ${originalTarget} -> ${target}-vendor`, !enableLogger)
                   return `${target}-vendor`
                 }
               }
