@@ -4,6 +4,43 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@types/lodash':
+      specifier: ^4.17.13
+      version: 4.17.15
+    lodash:
+      specifier: ^4.17.21
+      version: 4.17.21
+  uniapp:
+    '@dcloudio/types':
+      specifier: 3.4.14
+      version: 3.4.14
+    '@dcloudio/uni-app':
+      specifier: 3.0.0-4060620250520001
+      version: 3.0.0-4060620250520001
+    '@dcloudio/uni-automator':
+      specifier: 3.0.0-4060620250520001
+      version: 3.0.0-4060620250520001
+    '@dcloudio/uni-cli-shared':
+      specifier: 3.0.0-4060620250520001
+      version: 3.0.0-4060620250520001
+    '@dcloudio/uni-components':
+      specifier: 3.0.0-4060620250520001
+      version: 3.0.0-4060620250520001
+    '@dcloudio/uni-h5':
+      specifier: 3.0.0-4060620250520001
+      version: 3.0.0-4060620250520001
+    '@dcloudio/uni-mp-weixin':
+      specifier: 3.0.0-4060620250520001
+      version: 3.0.0-4060620250520001
+    '@dcloudio/vite-plugin-uni':
+      specifier: 3.0.0-4060620250520001
+      version: 3.0.0-4060620250520001
+    vue:
+      specifier: 3.4.21
+      version: 3.4.21
+
 importers:
 
   .:
@@ -23,6 +60,9 @@ importers:
       minimatch:
         specifier: ^9.0.5
         version: 9.0.5
+      nunjucks:
+        specifier: ^3.2.4
+        version: 3.2.4(chokidar@3.6.0)
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^4.3.0
@@ -36,6 +76,9 @@ importers:
       '@types/node':
         specifier: ^22.10.2
         version: 22.13.5
+      '@types/nunjucks':
+        specifier: ^3.2.6
+        version: 3.2.6
       bumpp:
         specifier: ^9.9.1
         version: 9.11.1
@@ -2232,6 +2275,9 @@ packages:
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
 
+  '@types/nunjucks@3.2.6':
+    resolution: {integrity: sha512-pHiGtf83na1nCzliuAdq8GowYiXvH5l931xZ0YEHaLMNFgynpEqx+IPStlu7UaDkehfvl01e4x/9Tpwhy7Ue3w==}
+
   '@types/prettier@2.7.3':
     resolution: {integrity: sha512-+68kP9yzs4LMp7VNh8gdzMSPZFL44MLGqiHWvttYJe+6qnuVr4Ek9wSBQoveqY/r+LwjCcU29kNVkidwim+kYA==}
 
@@ -2400,6 +2446,9 @@ packages:
     resolution: {integrity: sha512-E+iruNOY8VV9s4JEbe1aNEm6MiszPRr/UfcHMz0TQh1BXSxHK+ASV1R6W4HpjBhSeS+54PIsAMCBmwD06LLsqQ==}
     hasBin: true
 
+  a-sync-waterfall@1.0.1:
+    resolution: {integrity: sha512-RYTOHHdWipFUliRFMCS4X2Yn2X8M87V/OpSqWzKKOGhzqyUxzyVmhHDH9sAvG+ZuQf/TAOFsLCpMw09I1ufUnA==}
+
   abab@2.0.6:
     resolution: {integrity: sha512-j2afSsaIENvHZN2B8GOpF566vZ5WVk5opAiMTvWgaQT8DkbOqsTfvNAvHoRGU2zzP8cPoqys+xHTRDWW8L+/BA==}
     deprecated: Use your platform's native atob() and btoa() methods instead
@@ -2511,6 +2560,9 @@ packages:
 
   array-ify@1.0.0:
     resolution: {integrity: sha512-c5AMf34bKdvPhQ7tBGhqkgKNUzMr4WUs+WDtC2ZUGOUncbxKMTvqxYctiseW3+L4bA8ec+GcZ6/A/FW4m8ukng==}
+
+  asap@2.0.6:
+    resolution: {integrity: sha512-BSHWgDSAiKs50o2Re8ppvp3seVHXSRM44cdSsT9FfNEUUZLOGWVCsiWaRPWM1Znn+mqZ1OfVZ3z3DWEzSp7hRA==}
 
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
@@ -2815,6 +2867,10 @@ packages:
 
   commander@2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
+
+  commander@5.1.0:
+    resolution: {integrity: sha512-P0CysNDQ7rtVw4QIQtm+MRxV66vKFSvlsQvGYXZWR3qFU0jlMKHZZZgw8e+8DSah4UDKMqnknRDQz+xuQXQ/Zg==}
+    engines: {node: '>= 6'}
 
   commander@7.2.0:
     resolution: {integrity: sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==}
@@ -4653,6 +4709,16 @@ packages:
 
   nth-check@2.1.1:
     resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
+
+  nunjucks@3.2.4:
+    resolution: {integrity: sha512-26XRV6BhkgK0VOxfbU5cQI+ICFUtMLixv1noZn1tGU38kQH5A5nmmbk/O45xdyBhD1esk47nKrY0mvQpZIhRjQ==}
+    engines: {node: '>= 6.9.0'}
+    hasBin: true
+    peerDependencies:
+      chokidar: ^3.3.0
+    peerDependenciesMeta:
+      chokidar:
+        optional: true
 
   nwsapi@2.2.16:
     resolution: {integrity: sha512-F1I/bimDpj3ncaNDhfyMWuFqmQDBwDB0Fogc2qpL3BWvkQteFD/8BzWuIRl83rq0DXfm8SGt/HFhLXZyljTXcQ==}
@@ -8538,6 +8604,8 @@ snapshots:
 
   '@types/normalize-package-data@2.4.4': {}
 
+  '@types/nunjucks@3.2.6': {}
+
   '@types/prettier@2.7.3': {}
 
   '@types/resolve@1.20.2': {}
@@ -8802,6 +8870,8 @@ snapshots:
       jsonparse: 1.3.1
       through: 2.3.8
 
+  a-sync-waterfall@1.0.1: {}
+
   abab@2.0.6: {}
 
   accepts@1.3.8:
@@ -8894,6 +8964,8 @@ snapshots:
   array-flatten@1.1.1: {}
 
   array-ify@1.0.0: {}
+
+  asap@2.0.6: {}
 
   asynckit@0.4.0: {}
 
@@ -9247,6 +9319,8 @@ snapshots:
   commander@13.1.0: {}
 
   commander@2.20.3: {}
+
+  commander@5.1.0: {}
 
   commander@7.2.0: {}
 
@@ -11648,6 +11722,14 @@ snapshots:
     dependencies:
       boolbase: 1.0.0
 
+  nunjucks@3.2.4(chokidar@3.6.0):
+    dependencies:
+      a-sync-waterfall: 1.0.1
+      asap: 2.0.6
+      commander: 5.1.0
+    optionalDependencies:
+      chokidar: 3.6.0
+
   nwsapi@2.2.16: {}
 
   nypm@0.5.4:
@@ -12716,7 +12798,7 @@ snapshots:
 
   unimport@4.1.1:
     dependencies:
-      acorn: 8.14.0
+      acorn: 8.15.0
       escape-string-regexp: 5.0.0
       estree-walker: 3.0.3
       fast-glob: 3.3.3
@@ -12724,7 +12806,7 @@ snapshots:
       magic-string: 0.30.17
       mlly: 1.7.4
       pathe: 2.0.3
-      picomatch: 4.0.2
+      picomatch: 4.0.3
       pkg-types: 1.3.1
       scule: 1.3.0
       strip-literal: 3.0.0
@@ -12773,7 +12855,7 @@ snapshots:
     dependencies:
       local-pkg: 1.0.0
       magic-string: 0.30.17
-      picomatch: 4.0.2
+      picomatch: 4.0.3
       unimport: 4.1.1
       unplugin: 2.3.5
       unplugin-utils: 0.2.5
@@ -12791,7 +12873,7 @@ snapshots:
   unplugin@2.3.5:
     dependencies:
       acorn: 8.15.0
-      picomatch: 4.0.2
+      picomatch: 4.0.3
       webpack-virtual-modules: 0.6.2
 
   untyped@1.5.2:

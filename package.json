@@ -60,13 +60,15 @@
     "@node-rs/xxhash": "^1.7.6",
     "chalk": "4.1.2",
     "magic-string": "^0.30.17",
-    "minimatch": "^9.0.5"
+    "minimatch": "^9.0.5",
+    "nunjucks": "^3.2.4"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.3.0",
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
     "@types/node": "^22.10.2",
+    "@types/nunjucks": "^3.2.6",
     "bumpp": "^9.9.1",
     "commitizen": "^4.3.0",
     "cz-git": "^1.9.1",
