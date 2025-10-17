@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title }}</title>
+  <style>
+    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #1e1e1e; }
+    * { margin: 0; padding: 0; }
+    #main { width: 100%; height: 100%; }
+    .info { position: fixed; top: 10px; right: 10px; color: #fff; font-family: sans-serif; font-size: 12px; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 3px; z-index: 10; }
+  </style>
+  <script>
+    function getNextSegment(text, options) {
+      const { maxLength, breakChars, searchRange, includeSeparator } = options;
+      if (text.length <= maxLength) {
+        return {
+          segment: text,
+          position: { type: "full", index: text.length }
+        };
+      }
+      const searchStart = Math.max(0, maxLength - searchRange);
+      const searchEnd = Math.min(text.length, maxLength + searchRange);
+      const searchSegment = text.substring(searchStart, searchEnd);
+      let breakIndex = -1;
+      let breakChar = "";
+      for (let i = searchSegment.length - 1;i >= 0; i--) {
+        if (breakChars.includes(searchSegment[i])) {
+          breakIndex = searchStart + i;
+          breakChar = searchSegment[i];
+          break;
+        }
+      }
+      let segmentEnd;
+      let positionType;
+      if (breakIndex !== -1) {
+        segmentEnd = includeSeparator ? breakIndex + 1 : breakIndex;
+        positionType = "separator";
+      } else {
+        segmentEnd = maxLength;
+        positionType = "hard";
+      }
+      return {
+        segment: text.substring(0, segmentEnd),
+        position: {
+          type: positionType,
+          index: segmentEnd,
+          char: breakChar
+        }
+      };
+    }
+    function calculateTotalSegments(text, options) {
+      if (!text)
+        return 0;
+      let count = 0;
+      let remaining = text;
+      while (remaining.length > 0) {
+        count++;
+        const segmentInfo = getNextSegment(remaining, options);
+        remaining = remaining.substring(segmentInfo.segment.length);
+      }
+      return count;
+    }
+    function createSegmentIterator(text, options = {}) {
+      const defaultOptions = {
+        maxLength: 100,
+        breakChars: ["/", "\\", ".", "-", "_", " ", "?", "&", "="],
+        searchRange: 30,
+        includeSeparator: false
+      };
+      const mergedOptions = { ...defaultOptions, ...options };
+      let remaining = text || "";
+      let index = 0;
+      const totalSegments = calculateTotalSegments(text, mergedOptions);
+      const iterator = {
+        [Symbol.iterator]: function* () {
+          while (remaining.length > 0) {
+            const segmentInfo = getNextSegment(remaining, mergedOptions);
+            const segment = segmentInfo.segment;
+            const isLast = remaining.length === segment.length;
+            const result = {
+              segment,
+              index,
+              total: totalSegments,
+              isFirst: index === 0,
+              isLast,
+              position: segmentInfo.position
+            };
+            remaining = remaining.substring(segment.length);
+            index++;
+            yield result;
+          }
+        },
+        toArray() {
+          return Array.from(this);
+        },
+        map(callback) {
+          const results = [];
+          let currentIndex = 0;
+          for (const segmentInfo of this) {
+            const result = callback(segmentInfo, currentIndex, totalSegments);
+            results.push(result);
+            currentIndex++;
+          }
+          return results;
+        },
+        join(separator = "", callback) {
+          const segments = [];
+          let currentIndex = 0;
+          for (const segmentInfo of this) {
+            const segmentText = callback ? callback(segmentInfo) : segmentInfo.segment;
+            segments.push(segmentText);
+            currentIndex++;
+          }
+          return segments.join(separator);
+        }
+      };
+      return iterator;
+    }
+    function processSegments(text, options = {}, callback, joinSeparator = "<br/>") {
+      if (!text) return "";
+      const iterator = createSegmentIterator(text, options);
+      if (callback) {
+        return iterator.join(joinSeparator, (info) => callback(info, info.index, info.total));
+      }
+      return iterator.join(joinSeparator);
+    }
+    const formatLongText = (text) => processSegments(
+      text,
+      { maxLength: 50, breakChars: ["/", "\\", "@", "?", "&", "="], includeSeparator: false },
+      (info) => {
+        return `<span style="font-family: monospace;">${info.segment}</span>`;
+      }
+    );
+  </script>
+</head>
+<body>
+  <div class="info">
+    <p>
+    Last updated: {{ now() | date('toLocaleString') }}
+    {% if isDevServer %}
+      - Changes will be reflected on next data fetch.
+    {% else %}
+      - Rebuild project to see changes.
+    {% endif %}
+    </p>
+    Switch selectedMode:
+    <select id="modeSelect" onchange="(renderOptions.selectedMode = this.value, renderChart(data))">
+      <option value="multiple" selected>Multiple</option>
+      <option value="single">Single</option>
+    </select>
+    <br />
+    Switch graphLayout:
+    <select id="layoutSelect" onchange="(renderOptions.graphLayout = this.value, renderChart(data))">
+      <option value="force" selected>Force</option>
+      <option value="circular">Circular</option>
+      <option value="none">None</option>
+    </select>
+  </div>
+  <div id="main"></div>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <script>
+    const chartDom = document.getElementById('main');
+    const myChart = echarts.init(chartDom, 'dark');
+    let data = null;
+    const renderOptions = {
+      /** 'single' | 'multiple' */
+      selectedMode: 'multiple',
+      /** 'force' | 'circular' | 'none' */
+      graphLayout: 'force',
+    };
+    
+
+    function renderChart(graphData, moreOptions = renderOptions) {
+      if (!graphData) return;
+
+      console.log(graphData);
+      const option = {
+        tooltip: {
+          formatter: (params) => {
+            if (params.dataType === 'node') {
+              return formatLongText(params.data.id ?? params.name);
+            }
+            if (params.dataType === 'edge') {
+              const source = params.data.source;
+              const target = params.data.target;
+              if (source && target) {
+                const formattedSource = `<span style="color: blue;">${formatLongText(source)}</span>`;
+                const formattedTarget = `<span style="color: red;">${formatLongText(target)}</span>`;
+
+                if (params.data.type === 'dynamic') {
+                  return `<span style="font-weight: bold;">${formattedSource} ➡️ <br/> ${formattedTarget}</span>`;
+                }
+                return `<span>${formattedSource} ➡️ <br/> ${formattedTarget}</span>`;
+              }
+            }
+            return params.name;
+          }
+        },
+        legend: [
+          {
+            selectedMode: moreOptions.selectedMode,
+            data: graphData.categories,
+            orient: 'vertical',
+            left: 10,
+            top: 20,
+            textStyle: { color: '#fff' },
+          },
+        ],
+        series: [{
+          type: 'graph',
+          layout: moreOptions.graphLayout,
+          animation: false,
+          draggable: true,
+          roam: true,
+          edgeSymbol: ['circle', 'arrow'],
+          edgeSymbolSize: [4, 10],
+          label: { show: true, position: 'right', formatter: '{b}' },
+          labelLayout: { hideOverlap: true },
+          force: { repulsion: 200, edgeLength: 100 },
+          categories: (graphData.categories || []).map(item => ({ name: item })),
+          data: graphData.nodes.map(node => ({ ...node, name: node.fileName, symbolSize: Math.min(10 + node.value * 5, 50) })),
+          // links: graphData.links,
+          links: graphData.links.map(link => ({
+            ...link,
+            symbolSize: [5, 20],
+            // 根据链接类型设置不同的样式
+            lineStyle: {
+              curveness: link.type === 'dynamic' ? 0.2 : 0,
+              type: link.type === 'dynamic' ? 'dashed' : 'solid', 
+              color: link.type === 'dynamic' ? 'rgba(255, 153, 0, 0.6)' : 'rgba(204, 204, 204, 0.6)'
+            }
+          })),
+          emphasis: { focus: 'adjacency', lineStyle: { width: 10 } }
+        }],
+      };
+      console.log(option);
+      myChart.setOption(option);
+    }
+
+    {% if isDevServer %}
+      // 模式一：Vite Dev Server - 动态获取数据
+      myChart.showLoading();
+      fetch('{{ dataUrl }}')
+        .then(response => response.json())
+        .then(res => {
+          data = res;
+          myChart.hideLoading();
+          renderChart(data);
+        })
+        .catch(err => {
+          myChart.hideLoading();
+          console.error("Failed to fetch graph data:", err);
+        });
+    {% else %}
+      // 模式二：静态构建 - 数据是直接内联的
+      data = {{ dataJsonString | safe }};
+      renderChart(data);
+    {% endif %}
+
+    window.addEventListener('resize', () => myChart.resize());
+  </script>
+</body>
+</html>
