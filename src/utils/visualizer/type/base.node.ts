@@ -1,13 +1,7 @@
-/** 节点类型 */
-export enum GraphNodeType {
-  ASSET = 'asset',
-  CHUNK = 'chunk',
-}
-
 /**
  * 基础节点
  */
-export interface GraphBaseNode {
+export interface GraphBaseNode<T extends string = string> {
   /** 唯一标识符，直接使用 Rollup 的 module.id */
   id: string
   /** 简短文本 */
@@ -15,31 +9,11 @@ export interface GraphBaseNode {
   /** 业务需求的显示文本 */
   label?: string
   /** 节点类型 */
-  type: `${GraphNodeType}`
-  /** 节点的权重值 */
-  value?: number
-  /** 节点类别索引 */
-  category?: number
-}
-
-export interface GraphChunkNode extends GraphBaseNode {
-  type: 'chunk'
-  /** 是否为打包入口 */
-  isEntry: boolean
-  /** 是否为外部依赖 */
-  isExternal: boolean
-  code?: string | null
-}
-
-export interface GraphAssetNode extends GraphBaseNode {
-  type: 'asset'
+  type: T
   /**
-   * 资源类型
-   * @description 一般是文件扩展名
+   * 节点的权重值
+   * @TODO: 权重值其实是业务概念；
+   * 后续将展示节点的出度、入度，废弃此字段
    */
-  resourceType: string
-  /** 资源内容 */
-  source?: string | Uint8Array
+  value?: number
 }
-
-export type GraphNode = GraphChunkNode | GraphAssetNode

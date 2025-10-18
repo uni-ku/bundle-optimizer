@@ -1,7 +1,7 @@
 /**
  * 节点连接关系
  */
-export interface GraphLink {
+export interface GraphLink<T extends string = string> {
   /** 依赖来源方的 id */
   source: string
 
@@ -11,5 +11,5 @@ export interface GraphLink {
   /**
    * 边的类型
    */
-  type: 'static' | 'dynamic'
+  type: T
 }

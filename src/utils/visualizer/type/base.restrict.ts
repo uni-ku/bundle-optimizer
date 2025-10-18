@@ -1,4 +1,4 @@
-import type { GraphAssetNode, GraphChunkNode } from './base.node'
+import type { GraphBaseNode } from './base.node'
 
 /**
  * 图形受限域
@@ -20,7 +20,7 @@ export interface GraphRestrictArea {
   level?: number
 }
 
-/** 受限作用锚点 */
+/** 受限锚点 */
 export interface GraphRestrictAnchor {
   /** 受限域id */
   areaId: string
@@ -31,13 +31,6 @@ export interface GraphRestrictAnchor {
   id: string
 }
 
-/** 受限 Chunk 节点 */
-export interface RestrictGraphChunkNode extends GraphRestrictAnchor, GraphChunkNode {
-}
-
-/** 受限 Asset 节点 */
-export interface RestrictGraphAssetNode extends GraphRestrictAnchor, GraphAssetNode {
-}
-
 /** 受限节点 */
-export type RestrictGraphNode = RestrictGraphChunkNode | RestrictGraphAssetNode
+export interface RestrictGraphNode<T extends string = string> extends GraphRestrictAnchor, GraphBaseNode<T> {
+}

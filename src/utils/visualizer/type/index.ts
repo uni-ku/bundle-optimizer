@@ -1,3 +1,4 @@
 export * from './base.link'
 export * from './base.node'
-export * from './restrict'
+export * from './base.restrict'
+export * from './vite'

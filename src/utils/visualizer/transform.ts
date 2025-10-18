@@ -1,5 +1,5 @@
 import type { ManualChunkMeta } from '../../type'
-import type { GraphChunkNode, GraphLink, GraphNode } from './type'
+import type { ViteNode, ViteNodeLink } from './type'
 import path from 'node:path'
 
 /**
@@ -22,9 +22,9 @@ function parseModuleId(id: string): { fileName: string, ext: string, name: strin
  */
 export function transformDataForECharts(
   pluginContext: ManualChunkMeta,
-): { nodes: GraphNode[], links: GraphLink[] } {
-  const nodeMap = new Map<string, GraphNode>()
-  const links: GraphLink[] = []
+): { nodes: ViteNode[], links: ViteNodeLink[] } {
+  const nodeMap = new Map<string, ViteNode>()
+  const links: ViteNodeLink[] = []
 
   // =================================================================
   // 收集所有节点和链接
@@ -42,16 +42,14 @@ export function transformDataForECharts(
     if (!nodeMap.has(id)) {
       const { fileName: name, name: label } = parseModuleId(id)
 
-      const node: GraphChunkNode = {
+      nodeMap.set(id, {
         id,
         name,
         label,
         type: 'chunk',
         isEntry: moduleInfo.isEntry,
-        isExternal: moduleInfo?.isExternal ?? true,
         code: moduleInfo.code,
-      }
-      nodeMap.set(id, node)
+      })
     }
 
     // 处理静态依赖 (Static Imports)
@@ -67,7 +65,6 @@ export function transformDataForECharts(
           label,
           type: 'chunk',
           isEntry: targetModuleInfo?.isEntry ?? false,
-          isExternal: targetModuleInfo?.isExternal ?? true,
           code: targetModuleInfo?.code,
         })
       }
@@ -90,7 +87,6 @@ export function transformDataForECharts(
           label,
           type: 'chunk',
           isEntry: targetModuleInfo?.isEntry ?? false,
-          isExternal: targetModuleInfo?.isExternal ?? true,
           code: targetModuleInfo?.code,
         })
       }
