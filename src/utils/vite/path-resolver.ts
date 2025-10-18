@@ -1,7 +1,7 @@
 import type { Alias, UserConfig } from 'vite'
 import path from 'node:path'
 import { isRegExp } from 'node:util/types'
-import { normalizePath } from '.'
+import { normalizePath } from '..'
 
 /**
  * @link https://github.com/rollup/plugins/blob/c3dcdc0d2eda4db74bdc772bc369f3f9325802bf/packages/alias/src/index.ts#L7

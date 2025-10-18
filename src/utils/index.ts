@@ -160,5 +160,6 @@ export function parseQuerystring(url?: any) {
   }
 }
 
-export * from './getViteConfigPaths'
 export * from './lex-parse'
+export * from './regexp'
+export * from './vite'
