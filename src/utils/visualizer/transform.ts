@@ -40,14 +40,13 @@ export function transformDataForECharts(
     // 我们假设所有能从 getModuleInfo 获取到的都是 'chunk' 类型
     // TODO: 真正的 'asset' 通常不在此列表中，它们需要在 generateBundle 中处理
     if (!nodeMap.has(id)) {
-      const { fileName, ext, name } = parseModuleId(id)
+      const { fileName: name, name: label } = parseModuleId(id)
 
       const node: GraphChunkNode = {
         id,
-        fileName,
         name,
+        label,
         type: 'chunk',
-        ext,
         isEntry: moduleInfo.isEntry,
         isExternal: moduleInfo?.isExternal ?? true,
         code: moduleInfo.code,
@@ -60,14 +59,13 @@ export function transformDataForECharts(
       // 确保目标节点也存在于 nodeMap 中
       if (!nodeMap.has(targetId)) {
         // 如果目标节点不存在，创建一个基础表示
-        const { fileName, ext, name } = parseModuleId(targetId)
+        const { fileName: name, name: label } = parseModuleId(targetId)
         const targetModuleInfo = pluginContext.getModuleInfo(targetId)
         nodeMap.set(targetId, {
           id: targetId,
-          fileName,
           name,
+          label,
           type: 'chunk',
-          ext,
           isEntry: targetModuleInfo?.isEntry ?? false,
           isExternal: targetModuleInfo?.isExternal ?? true,
           code: targetModuleInfo?.code,
@@ -84,14 +82,13 @@ export function transformDataForECharts(
     // 处理动态依赖 (Dynamic Imports)
     for (const targetId of moduleInfo.dynamicallyImportedIds) {
       if (!nodeMap.has(targetId)) {
-        const { fileName, ext, name } = parseModuleId(targetId)
+        const { fileName: name, name: label } = parseModuleId(targetId)
         const targetModuleInfo = pluginContext.getModuleInfo(targetId)
         nodeMap.set(targetId, {
           id: targetId,
-          fileName,
           name,
+          label,
           type: 'chunk',
-          ext,
           isEntry: targetModuleInfo?.isEntry ?? false,
           isExternal: targetModuleInfo?.isExternal ?? true,
           code: targetModuleInfo?.code,

@@ -10,12 +10,10 @@ export enum GraphNodeType {
 export interface GraphBaseNode {
   /** 唯一标识符，直接使用 Rollup 的 module.id */
   id: string
-  fileName: string
-  name?: string
+  name: string
+  label?: string
   /** 节点类型 */
   type: `${GraphNodeType}`
-  /** 文件扩展名 */
-  ext?: string
   /** 节点的权重值 */
   value?: number
   /** 节点类别索引 */

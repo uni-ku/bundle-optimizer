@@ -218,7 +218,7 @@
           labelLayout: { hideOverlap: true },
           force: { repulsion: 200, edgeLength: 100 },
           categories: (graphData.categories || []).map(item => ({ name: item })),
-          data: graphData.nodes.map(node => ({ ...node, name: node.fileName, symbolSize: Math.min(10 + node.value * 5, 50) })),
+          data: graphData.nodes.map(node => ({ ...node, symbolSize: Math.min(10 + node.value * 5, 50) })),
           // links: graphData.links,
           links: graphData.links.map(link => ({
             ...link,
