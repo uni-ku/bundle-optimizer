@@ -1,6 +1,9 @@
 import type { ManualChunkMeta } from '../../type'
-import type { ViteNode, ViteNodeLink } from './type'
+import type { GraphRestrictArea, ViteNode, ViteNodeLink, ViteRestrictNode } from './type'
 import path from 'node:path'
+import { parseQuerystring } from '..'
+import { parseVirtualPath } from '../uniapp'
+import { createRestrictAreaSearcher } from './helper'
 
 /**
  * 从模块 ID 中解析出干净的文件名和扩展名。
@@ -15,16 +18,94 @@ function parseModuleId(id: string): { fileName: string, ext: string, name: strin
   return { fileName, ext: ext.slice(1), name }
 }
 
-/**
- * 将 Rollup/Vite 的模块图数据转换为 ECharts 可用的格式
- * @param pluginContext - Rollup 插件的上下文对象 (`this`)
- * @returns 包含 nodes 和 links 的对象
- */
-export function transformDataForECharts(
+/** uniapp 项目的匹配模式 */
+function createUniappMatcher(id: string) {
+  const matchString = `${id}/index.vue`
+  const getBasePath = (path: string): string => {
+    const qIndex = path.indexOf('?')
+    return qIndex !== -1 ? path.substring(0, qIndex) : path
+  }
+
+  return (targetString: string) => {
+    const [is, result, _] = parseVirtualPath(targetString)
+
+    // 如果是 uniapp 的组件虚拟路径
+    if (is) {
+      // result 可能是相对路径
+      return result === matchString || matchString.endsWith(`/${result}`)
+    }
+
+    const basePath = getBasePath(targetString)
+    if (basePath === matchString) {
+      const parsedUrl = parseQuerystring(targetString)
+      // 检查是否是无参数的完全匹配，或者有查询参数的 script 类型
+      if (!parsedUrl || (parsedUrl.type === 'script' && parsedUrl.vue === true)) {
+        return true
+      }
+      // ?vue&type=style&lang.css
+      if (parsedUrl.type === 'style' && parsedUrl.vue === true && targetString.endsWith('.css')) {
+        return 'css'
+      }
+    }
+
+    return false
+  }
+}
+
+type MergeNode<N extends ViteRestrictNode | ViteNode, D = unknown> = D extends object ? N & D : N
+type AsNode<Restrict extends boolean = false, D = unknown> =
+    Restrict extends true
+      ? MergeNode<ViteRestrictNode, D>
+      : MergeNode<ViteNode, D>
+
+interface TransformRes<Restrict extends boolean = false, D = unknown> {
+  nodes: Array<AsNode<Restrict, D>>
+  links: ViteNodeLink[]
+}
+
+interface TransformDataFunction {
+  /**
+   * 将 Rollup/Vite 的模块图数据转换为 ECharts 可用的格式
+   * @param pluginContext - Rollup 插件的上下文对象 (`this`)
+   * @returns 包含 nodes 和 links 的对象
+   */
+  <T extends ViteNode, D extends T>(
+    pluginContext: ManualChunkMeta,
+    onSet?: (node: T) => D
+  ): TransformRes<false, D>
+
+  /**
+   * 将 Rollup/Vite 的模块图数据转换为 ECharts 可用的格式
+   * @param pluginContext - Rollup 插件的上下文对象 (`this`)
+   * @param restrictAreas - 受限域信息（需要含有 children 内容）
+   * @returns 包含 nodes 和 links 的对象
+   */
+  <T extends ViteRestrictNode, D extends T>(
+    pluginContext: ManualChunkMeta,
+    onSet?: (node: T) => D,
+    restrictAreas?: GraphRestrictArea[]
+  ): TransformRes<true, D>
+}
+
+export const transformDataForECharts: TransformDataFunction = <T extends ViteRestrictNode | ViteNode, D extends T>(
   pluginContext: ManualChunkMeta,
-): { nodes: ViteNode[], links: ViteNodeLink[] } {
-  const nodeMap = new Map<string, ViteNode>()
+  onSet?: (node: T) => D,
+  restrictAreas?: GraphRestrictArea[],
+) => {
+  const nodeMap = new Map<string, D>()
   const links: ViteNodeLink[] = []
+
+  // TODO: 在加入 map 时，从 restrictAreas 查找 node.id 是否在对应的受限域中
+  const restrictAreaSearcher = createRestrictAreaSearcher(restrictAreas, createUniappMatcher)
+
+  const execOnSet = (node: T): D => {
+    if (typeof onSet === 'function') {
+      const target = onSet(node)
+      if (typeof target === 'object')
+        return target
+    }
+    return node as D
+  }
 
   // =================================================================
   // 收集所有节点和链接
@@ -37,19 +118,29 @@ export function transformDataForECharts(
       continue
 
     // 创建或更新当前模块的节点 (Source Node)
-    // 我们假设所有能从 getModuleInfo 获取到的都是 'chunk' 类型
-    // TODO: 真正的 'asset' 通常不在此列表中，它们需要在 generateBundle 中处理
     if (!nodeMap.has(id)) {
       const { fileName: name, name: label } = parseModuleId(id)
-
-      nodeMap.set(id, {
-        id,
-        name,
-        label,
-        type: 'chunk',
-        isEntry: moduleInfo.isEntry,
-        code: moduleInfo.code,
-      })
+      const [area, matcheRes] = restrictAreaSearcher(id)
+      if (typeof matcheRes === 'string') {
+        nodeMap.set(id, execOnSet({
+          id,
+          name,
+          label,
+          type: 'asset',
+          resourceType: matcheRes,
+          area,
+        } as T))
+      }
+      else {
+        nodeMap.set(id, execOnSet({
+          id,
+          name,
+          label,
+          type: 'chunk',
+          isEntry: moduleInfo.isEntry,
+          area,
+        } as T))
+      }
     }
 
     // 处理静态依赖 (Static Imports)
@@ -59,14 +150,27 @@ export function transformDataForECharts(
         // 如果目标节点不存在，创建一个基础表示
         const { fileName: name, name: label } = parseModuleId(targetId)
         const targetModuleInfo = pluginContext.getModuleInfo(targetId)
-        nodeMap.set(targetId, {
-          id: targetId,
-          name,
-          label,
-          type: 'chunk',
-          isEntry: targetModuleInfo?.isEntry ?? false,
-          code: targetModuleInfo?.code,
-        })
+        const [area, matcheRes] = restrictAreaSearcher(targetId)
+        if (typeof matcheRes === 'string') {
+          nodeMap.set(targetId, execOnSet({
+            id: targetId,
+            name,
+            label,
+            type: 'asset',
+            resourceType: matcheRes,
+            area,
+          } as T))
+        }
+        else {
+          nodeMap.set(targetId, execOnSet({
+            id: targetId,
+            name,
+            label,
+            type: 'chunk',
+            isEntry: targetModuleInfo?.isEntry ?? false,
+            area,
+          } as T))
+        }
       }
 
       links.push({
@@ -81,14 +185,27 @@ export function transformDataForECharts(
       if (!nodeMap.has(targetId)) {
         const { fileName: name, name: label } = parseModuleId(targetId)
         const targetModuleInfo = pluginContext.getModuleInfo(targetId)
-        nodeMap.set(targetId, {
-          id: targetId,
-          name,
-          label,
-          type: 'chunk',
-          isEntry: targetModuleInfo?.isEntry ?? false,
-          code: targetModuleInfo?.code,
-        })
+        const [area, matcheRes] = restrictAreaSearcher(targetId)
+        if (typeof matcheRes === 'string') {
+          nodeMap.set(targetId, execOnSet({
+            id: targetId,
+            name,
+            label,
+            type: 'asset',
+            resourceType: matcheRes,
+            area,
+          } as T))
+        }
+        else {
+          nodeMap.set(targetId, execOnSet({
+            id: targetId,
+            name,
+            label,
+            type: 'chunk',
+            isEntry: targetModuleInfo?.isEntry ?? false,
+            area,
+          } as T))
+        }
       }
 
       links.push({
@@ -117,10 +234,7 @@ export function transformDataForECharts(
 
   // 更新 nodeMap 中每个节点的 value
   for (const [id, node] of nodeMap.entries()) {
-    // 这里需要类型守卫，因为 GraphNode 可能是 Asset
-    if (node.type === 'chunk') {
-      node.value = inDegreeMap.get(id) ?? 0
-    }
+    node.value = inDegreeMap.get(id) ?? 0
   }
 
   return {

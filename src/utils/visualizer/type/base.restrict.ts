@@ -22,8 +22,8 @@ export interface GraphRestrictArea {
 
 /** 受限锚点 */
 export interface GraphRestrictAnchor {
-  /** 受限域id */
-  areaId: string
+  /** 受限域信息 */
+  area: GraphRestrictArea
   /**
    * 唯一标识
    * @description 如果是文件系统可以用文件路径，不作限制
