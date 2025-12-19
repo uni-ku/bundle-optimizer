@@ -7,8 +7,9 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { parseManifestJsonOnce, parseMiniProgramPagesJson } from '@dcloudio/uni-cli-shared'
 import { logger } from '../common/Logger'
-import { EXTNAME_JS_RE, knownJsSrcRE, ROOT_DIR } from '../constants'
+import { EXT_RE, EXTNAME_JS_RE, ROOT_DIR } from '../constants'
 import { moduleIdProcessor as _moduleIdProcessor, normalizePath, parseQuerystring } from '../utils'
+import { parseVirtualPath } from '../utils/uniapp'
 
 /**
  * uniapp 分包优化插件
@@ -59,11 +60,19 @@ export function SubPackagesOptimization(enableLogger: boolean): Plugin {
 
   /**
    * # id处理器
-   * @description 将id中的moduleId转换为相对于inputDir的路径并去除查询参数后缀
+   * @description 将 moduleId 转换为相对于 inputDir 的路径并去除查询参数后缀
    */
   function moduleIdProcessor(id: string, removeQuery = true) {
     return _moduleIdProcessor(id, process.env.UNI_INPUT_DIR, removeQuery)
   }
+  /**
+   * # id处理器
+   * @description 将 moduleId 转换为相对于 rootDir 的路径并去除查询参数后缀
+   */
+  function moduleIdProcessorForRoot(id: string, removeQuery = true) {
+    return _moduleIdProcessor(id, undefined, removeQuery)
+  }
+
   /**
    * 判断该文件模块的来源
    */
@@ -179,7 +188,10 @@ export function SubPackagesOptimization(enableLogger: boolean): Plugin {
     return false
   }
 
-  /** 判断模块是否是一个 vue 文件的 script 函数模块 */
+  /**
+   * 判断模块是否是一个 vue 文件的 script 函数模块
+   * @deprecated 弃用，使用 isVueEntity：一旦 vue 实体文件确定编译去向之后，其关联的 css\js 会自动跟随
+   */
   const isVueScript = (moduleInfo: Partial<ModuleInfo>) => {
     if (!moduleInfo.id || !moduleInfo.importers?.length) {
       return false
@@ -191,6 +203,19 @@ export function SubPackagesOptimization(enableLogger: boolean): Plugin {
     const parsedUrl = parseQuerystring(clearId)
 
     return parsedUrl && parsedUrl.type === 'script' && parsedUrl.vue && importer === moduleIdProcessor(id)
+  }
+
+  /** 判断模块是否是一个 vue 文件本体 */
+  const isVueEntity = (moduleInfo: Partial<ModuleInfo>) => {
+    if (!moduleInfo.id || !moduleInfo.importers?.length || !moduleInfo.id.endsWith('.vue')) {
+      return false
+    }
+    const clearId = moduleIdProcessor(moduleInfo.id)
+    // info: 判断 importers 是否存在一个是虚拟组件（与当前moduleInfo.id一致）
+    return moduleInfo.importers.some((importer) => {
+      const [is, real, _type] = parseVirtualPath(importer)
+      return is && [moduleInfo.id, clearId].includes(real)
+    })
   }
   // #endregion
 
@@ -293,6 +318,10 @@ export function SubPackagesOptimization(enableLogger: boolean): Plugin {
             const moduleInfo = meta.getModuleInfo(id)
 
             if (moduleInfo) {
+              // 当 UNI_INPUT_DIR 和 VITE_ROOT_DIR 一致时，clearId 和 clearIdForRoot 是一致的
+              // hbx 创建的没有 src 的目录，就是一致的情况
+              // 其余情况，clearIdForRoot 是相对路径的情况下，clearId 可能是绝对路径
+              const clearIdForRoot = moduleIdProcessorForRoot(moduleInfo.id)
               const clearId = moduleIdProcessor(moduleInfo.id)
 
               if (mainFlag === id && !moduleInfo.isEntry && !findNodeModules([moduleInfo.id]).length) {
@@ -300,17 +329,16 @@ export function SubPackagesOptimization(enableLogger: boolean): Plugin {
                 return clearId
               }
 
-              // TODO: 绝对路径是 monorepo 项目结构下的三方依赖库的特点，这里暂时不做处理
-              if (isVueScript(moduleInfo) && !path.isAbsolute(clearId)) {
-                const originalTarget = clearId.replace(knownJsSrcRE, '')
-                // 规整没处理好的 vue 组件的 script 模块的去处
-                if (!pagesFlat.all.includes(originalTarget)) {
-                  // uniapp 会将三方库落盘路径 node_modules 改为 node-modules
-                  // TODO: 需要对此类业务总结、抽离
-                  const target = originalTarget.replace(/^(\.?\/)?node_modules\//, 'node-modules/')
-                  logger.info(`[optimization] 规整 vue-script 模块: ${originalTarget} -> ${target}-vendor`, !enableLogger)
-                  return `${target}-vendor`
-                }
+              // TODO: 绝对路径是 monorepo 项目结构下的三方依赖库的特点，或者其他情况，这里暂时不做处理
+              if (isVueEntity(moduleInfo) && !path.isAbsolute(clearIdForRoot)) {
+                const targetId = path.isAbsolute(clearId) ? clearIdForRoot : clearId
+                const originalTarget = targetId.replace(EXT_RE, '')
+                // 规整没处理好的 vue 实体模块
+                // uniapp 会将三方库落盘路径 node_modules 改为 node-modules
+                // TODO: 需要对此类业务总结、抽离
+                const target = originalTarget.replace(/^(\.?\/)?node_modules\//, 'node-modules/')
+                logger.info(`[optimization] 规整 vue 实体模块: ${originalTarget} -> ${target}-vendor`, !enableLogger)
+                return `${target}-vendor`
               }
             }
           }
