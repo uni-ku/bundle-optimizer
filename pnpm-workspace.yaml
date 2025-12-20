@@ -1,7 +1,12 @@
 packages:
   - 'examples/*'
 
+defines:
+  - &vue ^3.5.26
+
 catalog:
+  '@vue/compiler-sfc': *vue
+  '@vue/shared': *vue
   lodash: ^4.17.21
   '@types/lodash': ^4.17.13
 
