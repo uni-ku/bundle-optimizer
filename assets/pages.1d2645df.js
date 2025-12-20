@@ -1,0 +1,1 @@
+const a=[{path:"pages/index",style:{navigationBarTitleText:"uni-app"}}],t=[{root:"pages-sub-demo",pages:[{path:"index",style:{navigationBarTitleText:"子包示例"}}]},{root:"pages-sub-async/",pages:[{path:"index",style:{navigationBarTitleText:"pages-sub-async"}}]}];function e(){return a}function n(){return t}export{n as a,e as g};
