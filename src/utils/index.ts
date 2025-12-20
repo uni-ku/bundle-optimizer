@@ -160,6 +160,9 @@ export function parseQuerystring(url?: any) {
   }
 }
 
+export * from './ast'
 export * from './lex-parse'
 export * from './regexp'
+export * from './uniapp'
 export * from './vite'
+export * from './vue'
