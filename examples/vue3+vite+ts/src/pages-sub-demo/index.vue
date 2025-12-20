@@ -1,6 +1,6 @@
 <!-- eslint-disable no-console -->
 <script lang="ts" setup>
-import SubComponent from '@/pages-sub-async/component.vue?async'
+import SubComponent from '@/pages-sub-async/component.vue'
 import { onMounted, shallowRef } from 'vue'
 import { getSubPackageTestApi } from './api'
 import { MathUtils } from '@/lib/demo'
@@ -9,6 +9,12 @@ import demo from '@/api/test'
 import { getErrorReasonStrValue } from '@/lib/ajax-grpc'
 import { testUtil } from 'biz-components/utils'
 import DemoComponent from './components/demo1.vue'
+
+defineOptions({
+  componentPlaceholder: {
+    SubComponent: 'View',
+  },
+})
 
 demo('sub')
 

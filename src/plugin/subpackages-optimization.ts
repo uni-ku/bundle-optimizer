@@ -8,11 +8,10 @@ import path from 'node:path'
 import { parseManifestJsonOnce, parseMiniProgramPagesJson } from '@dcloudio/uni-cli-shared'
 import { logger } from '../common/Logger'
 import { EXT_RE, EXTNAME_JS_RE, ROOT_DIR } from '../constants'
-import { moduleIdProcessor as _moduleIdProcessor, normalizePath, parseQuerystring } from '../utils'
-import { parseVirtualPath } from '../utils/uniapp'
+import { moduleIdProcessor as _moduleIdProcessor, normalizePath, parseQuerystring, parseVirtualPath } from '../utils'
 
 /**
- * uniapp 分包优化插件
+ * ### uniapp 分包优化插件
  */
 export function SubPackagesOptimization(enableLogger: boolean): Plugin {
   const platform = process.env.UNI_PLATFORM

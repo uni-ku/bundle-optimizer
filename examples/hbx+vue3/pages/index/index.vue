@@ -11,10 +11,13 @@
 
 <script>
 	import { getMainPackageTestApi } from "@/api";
-	import SubPageAsync from "@/pages-sub/index/index.vue?async"
+	import SubPageAsync from "@/pages-sub/index/index.vue"
 	export default {
 		components: {
 			SubPageAsync,
+		},
+		componentPlaceholder: {
+			SubPageAsync: 'view'
 		},
 		data() {
 			return {

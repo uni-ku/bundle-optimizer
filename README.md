@@ -23,6 +23,41 @@
   >
   > 注意，这不是指静态导入，详见[此处](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/import)。
 - 组件异步跨包引用
+  > 在vue 组件的 `defineOptions` 宏指令或者默认导出下配置 `componentPlaceholder`，eg:
+  > ```vue
+  > <!-- setup 模式（组合式） -->
+  > <script setup>
+  > import SubComponent from '@/pages-sub-async/component.vue'
+  > import SubDemo from '@/pages-sub-demo/index.vue'
+  >
+  > defineOptions({
+  >   componentPlaceholder: {
+  >     SubComponent: 'view',
+  >     SubDemo: 'view',
+  >   },
+  > })
+  > </script>
+  > ```
+  > ```vue
+  > <!-- 默认导出模式（选项式） -->
+  > <script>
+  > import SubComponent from '@/pages-sub-async/component.vue'
+  > import SubDemo from '@/pages-sub-demo/index.vue'
+  >
+  > export default {
+  >   components: {
+  >     SubComponent,
+  >     SubDemo,
+  >   },
+  >   componentPlaceholder: {
+  >     SubComponent: 'view',
+  >     SubDemo: 'view',
+  >   },
+  > }
+  > </script>
+  > ```
+
+异步组件、异步模块引用基本原理：**详见 <https://developers.weixin.qq.com/miniprogram/dev/framework/subpackages/async.html>**
 
 ### 📦 安装
 
@@ -42,17 +77,6 @@ pnpm add -D @uni-ku/bundle-optimizer
 | enable.optimization       | `boolean`           | `true` | 分包优化启闭状态                           |
 | enable['async-import']    | `boolean`           | `true` | 模块异步跨包调用启闭状态                       |
 | enable['async-component'] | `boolean`           | `true` | 组件异步跨包引用启闭状态                       |
-
-| 参数-[dts]                      | 类型                  | 默认值                    | 描述                                                                                          |
-|-------------------------------|---------------------|------------------------|---------------------------------------------------------------------------------------------|
-| dts                           | `boolean`\|`object` | `true`                 | dts文件输出总配置，`true`时按照下列各配置的默认参数来（根目录下生成`async-component.d.ts`文件），`object`时可详细配置各类型文件的生成，详见下列 |
-| dts.enable                    | `boolean`           | `true`                 | 总配置，是否生成dts文件                                                                               |
-| dts.base                      | `string`            | `./`                   | 总配置，dts文件输出目录，可相对路径，也可绝对路径                                                                  |
-| dts['async-component']        | `boolean`\|`object` | `true`                 | `async-component`dts文件配置，默认为`true`（在项目根目录生成`async-component.d.ts`文件），`object`时可详细配置该项的生成    |
-| dts['async-component'].enable | `boolean`           | `true`                 | 是否生成dts文件                                                                                   |
-| dts['async-component'].base   | `string`            | `./`                   | dts文件输出目录，可相对路径，也可绝对路径                                                                      |
-| dts['async-component'].name   | `string`            | `async-component.d.ts` | dts文件名称，需要包含文件后缀                                                                            |
-| dts['async-component'].path   | `string`            | `${base}/${name}`      | dts文件输出路径，如果没有定义此项则会是`${base}/${name}`，否则此配置项优先级更高，可相对路径，也可绝对路径                             |
 
 | 参数-[logger] | 类型                    | 默认值     | 描述                                                                                                       |
 |-------------|-----------------------|---------|----------------------------------------------------------------------------------------------------------|
@@ -104,19 +128,6 @@ export default defineConfig({
         'async-import': true,
         'async-component': true,
       },
-      // dts文件输出配置，默认为true，即在项目根目录生成类型定义文件
-      dts: {
-        'enable': true,
-        'base': './',
-        // 上面是对类型生成的比较全局的一个配置
-        // 下面是对每个类型生成的配置，以下各配置均为可选参数
-        'async-component': {
-          enable: true,
-          base: './',
-          name: 'async-component.d.ts',
-          path: './async-component.d.ts',
-        },
-      },
       // 也可以传递具体的子插件的字符串列表，如 ['optimization', 'async-import', 'async-component']，开启部分插件的log功能
       logger: true, // 默认 false
     }),
@@ -139,27 +150,6 @@ export default defineConfig({
 ```
 
 > 使用了 `@uni-helper/vite-plugin-uni-manifest` 的项目，修改 `manifest.config.ts` 的对应配置项即可。
-
-#### 3. 将插件生成的类型标注文件加入 `tsconfig.json`
-
-插件运行时默认会在项目根目录下生成 `async-component.d.ts` 类型标注文件，需要将其加入到 `tsconfig.json` 的 `include` 配置项中；如果有自定义dts生成路径，则根据实际情况填写。
-
-当然，如果原来的配置已经覆盖到了这两个文件，就可以不加；如果没有运行项目的时候，这两个文件不会生成。
-
-```json
-{
-  "include": [
-    "async-component.d.ts"
-  ]
-}
-```
-
-- `async-component.d.ts`：拓展了 `import` 的 `静态引入`，引入路径后面加上`?async`即可实现小程序端的组件异步引用。
-- 异步组件、异步模块引用基本原理：**详见 <https://developers.weixin.qq.com/miniprogram/dev/framework/subpackages/async.html>**
-
-> 这个类型文件不会对项目的运行产生任何影响，只是为了让编辑器能够正确的识别本插件定义的自定义语法、类型。
->
-> 这个文件可以加入到 `.gitignore` 中，不需要提交到代码仓库。
 
 ### ✨ 例子
 
@@ -187,12 +177,16 @@ export default defineConfig({
   </summary>
   <br />
 
-- `模块异步跨包调用` 是指在一个分包中引用另一个分包中的模块（不限主包与分包），这里的模块可以是 js/ts 模块(插件)、vue 文件。当然，引入 vue 文件一般是没有什么意义的，但是也做了兼容处理。
+- `模块异步跨包调用` 是指在一个分包中引用另一个分包中的模块（不限主包与分包），这里的模块可以是 js/ts 模块(插件)。
 - `TODO:` 是否支持 json 文件？
+- `TODO:` 是否支持 vue 文件？当然，小程序环境引入 vue 文件一般是没有什么意义的。
+  > 目前实测，小程序环境下，千万不要对一个 vue 组件进行 `import()`，这会导致这个 vue 组件对应的页面或者文件空白，后续会尽可能填补这个缺陷
 
 可以直接使用 esm 的原生异步导入语法 `import()` 来实现模块的异步引入。
 - h5：原生支持
 - mp：转译成 `require.async()`
+- app：TODO: 待兼容
+- 其他 mp：TODO: 未做兼容测试，欢迎反馈
 
 ```js
 // js/ts 模块(插件) 异步引入
@@ -220,21 +214,52 @@ import('@/pages-sub-async/async-component/index.vue').then((res) => {
   <br />
 
 - `组件异步跨包引用` 是指在一个分包中引用另一个分包中的组件（不限主包与分包），这里的组件就是 vue 文件；貌似支持把页面文件也作为组件引入。
-- 在需要跨包引入的组件路径后面加上 `?async` 即可实现异步引入。
+- 需要在 vue 组件的 `defineOptions` 宏指令或者默认导出下配置 `componentPlaceholder`。
+- 由于小程序端需要 `kebab-case` 风格的组件名称，插件内部会自动处理你的 `componentPlaceholder` 配置：将组件名称（key）以及占位目标组件名（value）转换成 `kebab-case` 风格。
 
+**setup 模式（组合式）：**
 ```vue
+<!-- setup 模式（组合式） -->
 <script setup>
-import AsyncComponent from 'xxxxx.vue?async'
-</script>
+import SubComponent from '@/pages-sub-async/component.vue'
+import SubDemo from '@/pages-sub-demo/index.vue'
 
-<template>
-  <view>
-    <AsyncComponent />
-  </view>
-</template>
+defineOptions({
+  componentPlaceholder: {
+    SubComponent: 'view',
+    SubDemo: 'view',
+  },
+})
+</script>
+```
+**默认导出模式（选项式）：**
+> 可能有些环境不能使用 defineOptions 宏
+```vue
+<!-- 默认导出模式（选项式） -->
+<script>
+import SubComponent from '@/pages-sub-async/component.vue'
+import SubDemo from '@/pages-sub-demo/index.vue'
+
+export default {
+  components: {
+    SubComponent,
+    SubDemo,
+  },
+  componentPlaceholder: {
+    SubComponent: 'view',
+    SubDemo: 'view',
+  },
+}
+</script>
 ```
 
 </details>
+
+### 🙏 感谢
+
+- 感谢 [chouchouji](https://github.com/chouchouji) 提供的配置式异步组件导入的思路，插件指路 👉 [vite-plugin-component-placeholder](https://github.com/chouchouji/vite-plugin-component-placeholder)。
+  > 详见讨论 https://github.com/uni-ku/bundle-optimizer/issues/26#issuecomment-3611984928
+- 感谢 [vue-macros](https://github.com/vue-macros/vue-macros) 项目提供的 vue-sfc 以及宏指令解析实现。
 
 ### 🏝 周边
 

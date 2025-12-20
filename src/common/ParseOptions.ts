@@ -1,5 +1,4 @@
-import type { Enable, IDtsOptions, IOptions } from '../type'
-import { normalizePath } from '../utils'
+import type { Enable, IOptions } from '../type'
 
 export class ParseOptions {
   options: IOptions
@@ -22,28 +21,6 @@ export class ParseOptions {
           'async-component': origin['async-component'] ?? true,
           'async-import': origin['async-import'] ?? true,
         }
-  }
-
-  get dts() {
-    const { dts: origin = true } = this.options
-
-    if (typeof origin === 'boolean') {
-      return {
-        'async-component': this.generateDtsOptions(origin, 'async-component.d.ts'),
-      }
-    }
-
-    return {
-      'async-component': (origin.enable ?? true) !== false && this.generateDtsOptions(origin['async-component'], 'async-component.d.ts', origin.base),
-    }
-  }
-
-  generateDtsOptions(params: boolean | IDtsOptions = true, name: string, base = './') {
-    if (params === false)
-      return false
-
-    const path = typeof params === 'boolean' ? `${normalizePath(base).replace(/\/$/, '')}/${name}` : params.enable !== false && normalizePath(params.path || `${normalizePath(params.base ?? base).replace(/\/$/, '')}/${params.name ?? name}`)
-    return path !== false && { enable: true, path }
   }
 
   get logger() {

@@ -1,9 +1,16 @@
 <script setup lang="ts">
-import SubComponent from '@/pages-sub-async/component.vue?async'
-import SubDemo from '@/pages-sub-demo/index.vue?async'
+import SubComponent from '@/pages-sub-async/component.vue'
+import SubDemo from '@/pages-sub-demo/index.vue'
 import { onMounted } from 'vue'
 import { getMainPackageTestApi } from '@/api'
 import { getPages } from '@/lib/pages'
+
+defineOptions({
+  componentPlaceholder: {
+    SubComponent: 'view',
+    SubDemo: 'view',
+  },
+})
 
 function goDemoSubPage() {
   uni.navigateTo({
@@ -21,7 +28,7 @@ onMounted(async () => {
   <view class="center">
     uniapp 分包优化
   </view>
-    <biz-use-test />
+  <biz-use-test />
   <button @click="goDemoSubPage">
     前往子包
   </button>

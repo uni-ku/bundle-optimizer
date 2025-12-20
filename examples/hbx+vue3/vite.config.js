@@ -13,11 +13,6 @@ export default defineConfig({
         'async-import': true,
         'async-component': true,
       },
-      // dts文件输出配置，默认为true，即在项目根目录生成类型定义文件
-      dts: {
-        'enable': true,
-        'base': './types',
-      },
       // 也可以传递具体的子插件的字符串列表，如 ['optimization', 'async-import', 'async-component']，开启部分插件的log功能
       logger: true,
     }),

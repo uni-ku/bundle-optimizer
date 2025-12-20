@@ -44,11 +44,9 @@ export default (options: IOptions = {}): PluginOption => {
     // 分包优化
     parse.enable.optimization && SubPackagesOptimization(parse.logger.optimization),
     // js/ts插件的异步调用
-    // 处理 `AsyncImport` 函数调用的路径传参
     parse.enable['async-import'] && AsyncImportProcessor(parse.logger['async-import']),
     // vue组件的异步调用
-    // 处理 `.vue?async` 查询参数的静态导入
-    parse.enable['async-component'] && AsyncComponentProcessor(parse.dts['async-component'], parse.logger['async-component']),
+    parse.enable['async-component'] && AsyncComponentProcessor(parse.logger['async-component']),
   ]
 }
 
