@@ -28,7 +28,6 @@ export function AsyncComponentProcessor(enableLogger: boolean): Plugin {
 
   return {
     name: 'async-component-processor',
-    enforce: 'post', // 插件执行时机，在其他处理后执行
     async transform(source, id) {
       if (!isMP || !id.endsWith('.vue') || !source.includes(COMPONENT_PLACEHOLDER)) {
         return
@@ -78,13 +77,14 @@ export function AsyncComponentProcessor(enableLogger: boolean): Plugin {
         return
 
       for (const [outputPath, config] of asyncComponents) {
-        if (!fs.existsSync(outputPath)) {
+        const jsonPath = `${outputPath}.json`
+        if (!fs.existsSync(jsonPath)) {
           continue
         }
-        const content = fs.readFileSync(outputPath, 'utf-8')
+        const content = fs.readFileSync(jsonPath, 'utf-8')
         const json = JSON.parse(content)
         json.componentPlaceholder = config
-        fs.writeFileSync(outputPath, JSON.stringify(json, null, 2))
+        fs.writeFileSync(jsonPath, JSON.stringify(json, null, 2))
       }
     },
   }
