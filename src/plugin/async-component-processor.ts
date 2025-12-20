@@ -28,6 +28,7 @@ export function AsyncComponentProcessor(enableLogger: boolean): Plugin {
 
   return {
     name: 'async-component-processor',
+    enforce: 'pre',
     async transform(source, id) {
       if (!isMP || !id.endsWith('.vue') || !source.includes(COMPONENT_PLACEHOLDER)) {
         return
