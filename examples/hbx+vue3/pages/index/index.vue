@@ -26,7 +26,7 @@
 			import("../../pages-sub/index/index.vue").then((res) => {
 				console.log(111, res)
 			});
-      import("@/pages-sub/plugins/index").then((res) => {
+			import("@/pages-sub/plugins/index").then((res) => {
 				res?.default?.test(222)
 			});
 		},
