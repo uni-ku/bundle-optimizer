@@ -45,8 +45,8 @@ interface IDtsOptions {
   /**
    * 类型定义文件名（可选）
    *
-   * @description 默认为`async-import.d.ts`或`async-component.d.ts`
-   * @default 'async-import.d.ts' | 'async-component.d.ts'
+   * @description 默认为 `async-component.d.ts`
+   * @default 'async-component.d.ts'
    */
   name?: string
   /**
@@ -76,7 +76,7 @@ export interface IOptions {
    *
    * @description 默认为true，即在项目根目录生成类型定义文件
    */
-  dts?: Prettify<Partial<Omit<IDtsOptions, 'name' | 'path'> & Record<Exclude<Enable, 'optimization'>, IDtsOptions | boolean>>> | boolean
+  dts?: Prettify<Partial<Omit<IDtsOptions, 'name' | 'path'> & Record<Exclude<Enable, 'optimization' | 'async-import'>, IDtsOptions | boolean>>> | boolean
   /**
    * log 控制，默认不启用，为false
    */

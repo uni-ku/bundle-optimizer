@@ -15,16 +15,16 @@ function refresh() {
 
 const result = ref<any>(null)
 onMounted(async () => {
-  AsyncImport('@/pages-sub-async/plugin').then((res) => {
+  import('@/pages-sub-async/plugin').then((res) => {
     res.AsyncPluginDemo().run()
   })
-  AsyncImport('@/pages-sub-demo/index.vue').then((res) => {
+  import('@/pages-sub-demo/index.vue').then((res) => {
     console.log('[async-import-component]', res.default)
     setTimeout(() => {
       result.value = res.default
     }, 1000)
   })
-  await AsyncImport('@/pages-sub-async/plugin').then((res) => {
+  await import('@/pages-sub-async/plugin').then((res) => {
     res.AsyncPluginDemo().run()
   })
   console.log(MathUtils.add(1, 1), cloneDeep({}));

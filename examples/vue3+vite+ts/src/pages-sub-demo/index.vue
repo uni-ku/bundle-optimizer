@@ -22,16 +22,16 @@ const asyncComponent = shallowRef<any>()
 
 onMounted(async () => {
   console.log(getErrorReasonStrValue());
-  console.log(testUtil('111'));
+  testUtil('111');
 
-  AsyncImport('@/pages-sub-async/plugin').then((res) => {
+  import('@/pages-sub-async/plugin').then((res) => {
     res.AsyncPluginDemo().run()
   })
   getSubPackageTestApi("子包 api 请求模拟")
   console.log(MathUtils.add(0.1, 0.2), cloneDeep({}));
 
   // 加载异步组件
-  AsyncImport('./components/demo1.vue').then((res) => {
+  import('./components/demo1.vue').then((res) => {
     asyncComponent.value = res.default
   })
 })

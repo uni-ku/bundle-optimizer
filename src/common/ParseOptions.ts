@@ -30,13 +30,11 @@ export class ParseOptions {
     if (typeof origin === 'boolean') {
       return {
         'async-component': this.generateDtsOptions(origin, 'async-component.d.ts'),
-        'async-import': this.generateDtsOptions(origin, 'async-import.d.ts'),
       }
     }
 
     return {
       'async-component': (origin.enable ?? true) !== false && this.generateDtsOptions(origin['async-component'], 'async-component.d.ts', origin.base),
-      'async-import': (origin.enable ?? true) !== false && this.generateDtsOptions(origin['async-import'], 'async-import.d.ts', origin.base),
     }
   }
 

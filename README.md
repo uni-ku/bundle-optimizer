@@ -19,6 +19,9 @@
 
 - 分包优化
 - 模块异步跨包调用
+  > 允许使用 `import()` 语法，异步引用模块。
+  >
+  > 注意，这不是指静态导入，详见[此处](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/import)。
 - 组件异步跨包引用
 
 ### 📦 安装
@@ -31,34 +34,29 @@ pnpm add -D @uni-ku/bundle-optimizer
 
 #### 0. 插件可配置参数
 
-> ！<b style="color: red;">以下各参数均为可选参数</b>，默认开启所有插件功能，并在项目根目录下生成`async-import.d.ts`与`async-component.d.ts`文件
+> ！<b style="color: red;">以下各参数均为可选参数</b>，默认开启所有插件功能，并在项目根目录下生成`async-component.d.ts`文件
 
-|参数-[enable]|类型|默认值|描述|
-|---|---|---|---|
-|enable|`boolean`\|`object`|`true`|插件功能总开关，`object`时可详细配置各插件启闭状态，详见下列|
-|enable.optimization|`boolean`|`true`|分包优化启闭状态|
-|enable['async-import']|`boolean`|`true`|模块异步跨包调用启闭状态|
-|enable['async-component']|`boolean`|`true`|组件异步跨包引用启闭状态|
+| 参数-[enable]               | 类型                  | 默认值    | 描述                                 |
+|---------------------------|---------------------|--------|------------------------------------|
+| enable                    | `boolean`\|`object` | `true` | 插件功能总开关，`object`时可详细配置各插件启闭状态，详见下列 |
+| enable.optimization       | `boolean`           | `true` | 分包优化启闭状态                           |
+| enable['async-import']    | `boolean`           | `true` | 模块异步跨包调用启闭状态                       |
+| enable['async-component'] | `boolean`           | `true` | 组件异步跨包引用启闭状态                       |
 
-|参数-[dts]|类型|默认值|描述|
-|---|---|---|---|
-|dts|`boolean`\|`object`|`true`|dts文件输出总配置，`true`时按照下列各配置的默认参数来（根目录下生成`async-import.d.ts`与`async-component.d.ts`文件），`object`时可详细配置各类型文件的生成，详见下列|
-|dts.enable|`boolean`|`true`|总配置，是否生成dts文件|
-|dts.base|`string`|`./`|总配置，dts文件输出目录，可相对路径，也可绝对路径|
-|dts['async-import']|`boolean`\|`object`|`true`|`async-import`dts文件配置，默认为`true`（在项目根目录生成`async-import.d.ts`文件），`object`时可详细配置该项的生成|
-|dts['async-import'].enable|`boolean`|`true`|是否生成dts文件|
-|dts['async-import'].base|`string`|`./`|dts文件输出目录，可相对路径，也可绝对路径|
-|dts['async-import'].name|`string`|`async-import.d.ts`|dts文件名称，需要包含文件后缀|
-|dts['async-import'].path|`string`|`${base}/${name}`|dts文件输出路径，如果没有定义此项则会是`${base}/${name}`，否则此配置项优先级更高，可相对路径，也可绝对路径|
-|dts['async-component']|`boolean`\|`object`|`true`|`async-component`dts文件配置，默认为`true`（在项目根目录生成`async-component.d.ts`文件），`object`时可详细配置该项的生成|
-|dts['async-component'].enable|`boolean`|`true`|是否生成dts文件|
-|dts['async-component'].base|`string`|`./`|dts文件输出目录，可相对路径，也可绝对路径|
-|dts['async-component'].name|`string`|`async-component.d.ts`|dts文件名称，需要包含文件后缀|
-|dts['async-component'].path|`string`|`${base}/${name}`|dts文件输出路径，如果没有定义此项则会是`${base}/${name}`，否则此配置项优先级更高，可相对路径，也可绝对路径|
+| 参数-[dts]                      | 类型                  | 默认值                    | 描述                                                                                          |
+|-------------------------------|---------------------|------------------------|---------------------------------------------------------------------------------------------|
+| dts                           | `boolean`\|`object` | `true`                 | dts文件输出总配置，`true`时按照下列各配置的默认参数来（根目录下生成`async-component.d.ts`文件），`object`时可详细配置各类型文件的生成，详见下列 |
+| dts.enable                    | `boolean`           | `true`                 | 总配置，是否生成dts文件                                                                               |
+| dts.base                      | `string`            | `./`                   | 总配置，dts文件输出目录，可相对路径，也可绝对路径                                                                  |
+| dts['async-component']        | `boolean`\|`object` | `true`                 | `async-component`dts文件配置，默认为`true`（在项目根目录生成`async-component.d.ts`文件），`object`时可详细配置该项的生成    |
+| dts['async-component'].enable | `boolean`           | `true`                 | 是否生成dts文件                                                                                   |
+| dts['async-component'].base   | `string`            | `./`                   | dts文件输出目录，可相对路径，也可绝对路径                                                                      |
+| dts['async-component'].name   | `string`            | `async-component.d.ts` | dts文件名称，需要包含文件后缀                                                                            |
+| dts['async-component'].path   | `string`            | `${base}/${name}`      | dts文件输出路径，如果没有定义此项则会是`${base}/${name}`，否则此配置项优先级更高，可相对路径，也可绝对路径                             |
 
-|参数-[logger]|类型|默认值|描述|
-|---|---|---|---|
-|logger|`boolean`\|`string[]`|`false`|插件日志输出总配置，`true`时启用所有子插件的日志功能；`string[]`时可具体启用部分插件的日志，可以是`optimization`、`async-component`、`async-import`|
+| 参数-[logger] | 类型                    | 默认值     | 描述                                                                                                       |
+|-------------|-----------------------|---------|----------------------------------------------------------------------------------------------------------|
+| logger      | `boolean`\|`string[]` | `false` | 插件日志输出总配置，`true`时启用所有子插件的日志功能；`string[]`时可具体启用部分插件的日志，可以是`optimization`、`async-component`、`async-import` |
 
 #### 1. 引入 `@uni-ku/bundle-optimizer`
 
@@ -77,17 +75,12 @@ export default defineConfig({
   plugins: [
     Uni(),
     Optimization({
-      enable: {
-        'optimization': true,
-        'async-import': true,
-        'async-component': true,
-      },
-      dts: {
-        enable: true,
-        base: './',
-      },
-      logger: true,
+      enable: true,
+      dts: true,
+      logger: false,
     }),
+    // 以上配置都是默认配置，可以直接不传任何配置
+    // Optimization(),
   ],
 })
 ```
@@ -117,12 +110,6 @@ export default defineConfig({
         'base': './',
         // 上面是对类型生成的比较全局的一个配置
         // 下面是对每个类型生成的配置，以下各配置均为可选参数
-        'async-import': {
-          enable: true,
-          base: './',
-          name: 'async-import.d.ts',
-          path: './async-import.d.ts',
-        },
         'async-component': {
           enable: true,
           base: './',
@@ -131,7 +118,7 @@ export default defineConfig({
         },
       },
       // 也可以传递具体的子插件的字符串列表，如 ['optimization', 'async-import', 'async-component']，开启部分插件的log功能
-      logger: true,
+      logger: true, // 默认 false
     }),
   ],
 })
@@ -155,30 +142,28 @@ export default defineConfig({
 
 #### 3. 将插件生成的类型标注文件加入 `tsconfig.json`
 
-插件运行时默认会在项目根目录下生成 `async-import.d.ts` 与 `async-component.d.ts` 两个类型标注文件，需要将其加入到 `tsconfig.json` 的 `include` 配置项中；如果有自定义dts生成路径，则根据实际情况填写。
+插件运行时默认会在项目根目录下生成 `async-component.d.ts` 类型标注文件，需要将其加入到 `tsconfig.json` 的 `include` 配置项中；如果有自定义dts生成路径，则根据实际情况填写。
 
 当然，如果原来的配置已经覆盖到了这两个文件，就可以不加；如果没有运行项目的时候，这两个文件不会生成。
 
 ```json
 {
   "include": [
-    "async-import.d.ts",
     "async-component.d.ts"
   ]
 }
 ```
 
-- `async-import.d.ts`：定义了 `AsyncImport` 这个异步函数，用于异步引入模块。
 - `async-component.d.ts`：拓展了 `import` 的 `静态引入`，引入路径后面加上`?async`即可实现小程序端的组件异步引用。
-- **详见 <https://developers.weixin.qq.com/miniprogram/dev/framework/subpackages/async.html>**
+- 异步组件、异步模块引用基本原理：**详见 <https://developers.weixin.qq.com/miniprogram/dev/framework/subpackages/async.html>**
 
-> 这两个类型文件不会对项目的运行产生任何影响，只是为了让编辑器能够正确的识别本插件定义的自定义语法、类型。
+> 这个类型文件不会对项目的运行产生任何影响，只是为了让编辑器能够正确的识别本插件定义的自定义语法、类型。
 >
-> 这两个文件可以加入到 `.gitignore` 中，不需要提交到代码仓库。
+> 这个文件可以加入到 `.gitignore` 中，不需要提交到代码仓库。
 
 ### ✨ 例子
 
-> 以下例子均以CLI创建项目为例, HBuilderX 项目与以上设置同理 ~~, 只要注意是否需要包含 src目录 即可~~。
+> 以下例子均以CLI创建项目为例, HBuilderX 项目与以上设置同理。
 >
 > 现在已经支持 hbx 创建的 vue3 + vite、不以 src 为主要代码目录的项目。
 
@@ -205,21 +190,23 @@ export default defineConfig({
 - `模块异步跨包调用` 是指在一个分包中引用另一个分包中的模块（不限主包与分包），这里的模块可以是 js/ts 模块(插件)、vue 文件。当然，引入 vue 文件一般是没有什么意义的，但是也做了兼容处理。
 - `TODO:` 是否支持 json 文件？
 
-可以使用函数 `AsyncImport` 这个异步函数来实现模块的异步引入。
+可以直接使用 esm 的原生异步导入语法 `import()` 来实现模块的异步引入。
+- h5：原生支持
+- mp：转译成 `require.async()`
 
 ```js
 // js/ts 模块(插件) 异步引入
-await AsyncImport('@/pages-sub-async/async-plugin/index').then((res) => {
+await import('@/pages-sub-async/async-plugin/index').then((res) => {
   console.log(res?.AsyncPlugin()) // 该插件导出了一个具名函数
 })
 
 // vue 文件 异步引入（页面文件）
-AsyncImport('@/pages-sub-async/index.vue').then((res) => {
+import('@/pages-sub-async/index.vue').then((res) => {
   console.log(res.default || res)
 })
 
 // vue 文件 异步引入（组件文件）
-AsyncImport('@/pages-sub-async/async-component/index.vue').then((res) => {
+import('@/pages-sub-async/async-component/index.vue').then((res) => {
   console.log(res.default || res)
 })
 ```
@@ -251,11 +238,11 @@ import AsyncComponent from 'xxxxx.vue?async'
 
 ### 🏝 周边
 
-|项目|描述|
-|---|---|
-|[Uni Ku](https://github.com/uni-ku)|有很多 Uniapp(Uni) 的酷(Ku) 😎|
-|[create-uni](https://uni-helper.js.org/create-uni)|🛠️ 快速创建uni-app项目|
-|[Wot Design Uni](https://github.com/Moonofweisheng/wot-design-uni/)|一个基于Vue3+TS开发的uni-app组件库，提供70+高质量组件|
+| 项目                                                                  | 描述                                  |
+|---------------------------------------------------------------------|-------------------------------------|
+| [Uni Ku](https://github.com/uni-ku)                                 | 有很多 Uniapp(Uni) 的酷(Ku) 😎           |
+| [create-uni](https://uni-helper.js.org/create-uni)                  | 🛠️ 快速创建uni-app项目                   |
+| [Wot Design Uni](https://github.com/Moonofweisheng/wot-design-uni/) | 一个基于Vue3+TS开发的uni-app组件库，提供70+高质量组件 |
 
 ### 🧔 找到我
 
