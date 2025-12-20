@@ -3,6 +3,7 @@ declare namespace NodeJS {
   interface ProcessEnv {
     UNI_PLATFORM?: string
     UNI_INPUT_DIR?: string
+    UNI_OUTPUT_DIR?: string
     UNI_OPT_TRACE?: string
   }
 

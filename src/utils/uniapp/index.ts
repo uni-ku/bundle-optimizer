@@ -1,4 +1,6 @@
 import type { ModuleInfo } from '../../type'
+import path from 'node:path'
+import process from 'node:process'
 import { moduleIdProcessor, parseQuerystring } from '..'
 import { ROOT_DIR } from '../../constants'
 import base64url from '../base64url'
@@ -47,6 +49,18 @@ export function parseVirtualPath<T extends string>(virtualUrl?: T): ParseResult 
     return [true, parseVirtualComponentPath(virtualUrl), 'component']
   }
   return [false, virtualUrl ?? '', null]
+}
+
+/**
+ * 获取 uniapp 输出目录
+ * @param filePath 源码绝对路径
+ * @link https://github.com/chouchouji/vite-plugin-component-placeholder/blob/4509023c4ee07c2219ec62b106de013dbd3f2a9d/src/index.ts#L8
+ */
+export function getUniappOutputPath(filePath: string) {
+  const relativePath = path.relative(process.env.UNI_INPUT_DIR!, filePath)
+  const { name, dir } = path.parse(relativePath)
+
+  return path.join(process.env.UNI_OUTPUT_DIR!, dir, name)
 }
 
 /**
