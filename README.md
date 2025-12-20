@@ -11,6 +11,9 @@
 >
 > 前往 <https://github.com/Vanisper/uniapp-bundle-optimizer> 查看本插件详细发展过程与提交记录。
 
+> [!CAUTION]
+> **v2.0.0版本开始，有重大更新，如果您是从旧版本升级，请务必阅读 [迁移指南 (MIGRATION.MD)](./MIGRATION.md)。**
+
 ### 🎏 功能与支持
 
 > ！<b style="color: red;">暂时没有对App平台做兼容性实现</b>
