@@ -26,9 +26,10 @@
 		},
 		onLoad() {
 			getMainPackageTestApi("主包 api 请求模拟");
-			import("../../pages-sub/index/index.vue").then((res) => {
-				console.log(111, res)
-			});
+			// TODO: 对 vue 文件的这种引用会和分包优化的一个行为有冲突，导致目标组件对应的页面、组件空白
+			// import("../../pages-sub/index/index.vue").then((res) => {
+			// 	console.log(111, res)
+			// });
 			import("@/pages-sub/plugins/index").then((res) => {
 				res?.default?.test(222)
 			});

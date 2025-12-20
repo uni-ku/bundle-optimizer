@@ -196,12 +196,12 @@ await import('@/pages-sub-async/async-plugin/index').then((res) => {
   console.log(res?.AsyncPlugin()) // 该插件导出了一个具名函数
 })
 
-// vue 文件 异步引入（页面文件）
+// vue 文件 异步引入（页面文件）❌ 暂时不要这样使用，不要这样引用组件文件
 import('@/pages-sub-async/index.vue').then((res) => {
   console.log(res.default || res)
 })
 
-// vue 文件 异步引入（组件文件）
+// vue 文件 异步引入（组件文件）❌ 暂时不要这样使用，不要这样引用组件文件
 import('@/pages-sub-async/async-component/index.vue').then((res) => {
   console.log(res.default || res)
 })
