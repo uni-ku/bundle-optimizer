@@ -37,9 +37,9 @@ export function isUniVirtualPath(path: string): path is `${typeof uniPagePrefix}
 }
 
 // Old: [boolean, string, 'page' | 'component' | null]
-type ParseResult =
-  | [true, string, 'page' | 'component']
-  | [false, string, null]
+type ParseResult
+  = | [true, string, 'page' | 'component']
+    | [false, string, null]
 
 export function parseVirtualPath<T extends string>(virtualUrl?: T): ParseResult {
   if (virtualUrl?.startsWith(uniPagePrefix)) {

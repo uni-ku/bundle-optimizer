@@ -53,10 +53,10 @@ function createUniappMatcher(id: string) {
 }
 
 type MergeNode<N extends ViteRestrictNode | ViteNode, D = unknown> = D extends object ? N & D : N
-type AsNode<Restrict extends boolean = false, D = unknown> =
-    Restrict extends true
-      ? MergeNode<ViteRestrictNode, D>
-      : MergeNode<ViteNode, D>
+type AsNode<Restrict extends boolean = false, D = unknown>
+  = Restrict extends true
+    ? MergeNode<ViteRestrictNode, D>
+    : MergeNode<ViteNode, D>
 
 interface TransformRes<Restrict extends boolean = false, D = unknown> {
   nodes: Array<AsNode<Restrict, D>>

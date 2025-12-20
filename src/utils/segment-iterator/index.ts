@@ -88,7 +88,7 @@ export function createSegmentIterator(text: string, options: SegmentIteratorOpti
   const totalSegments = calculateTotalSegments(text, mergedOptions)
 
   const iterator: SegmentIterator = {
-    *[Symbol.iterator](): Generator<SegmentInfo> {
+    * [Symbol.iterator](): Generator<SegmentInfo> {
       while (remaining.length > 0) {
         const segmentInfo = getNextSegment(remaining, mergedOptions)
         const segment = segmentInfo.segment
@@ -127,7 +127,7 @@ export function createSegmentIterator(text: string, options: SegmentIteratorOpti
       return results
     },
 
-    join(separator: string = '', callback?: (info: SegmentInfo, index: number,) => string): string {
+    join(separator: string = '', callback?: (info: SegmentInfo, index: number) => string): string {
       const segments: string[] = []
       let currentIndex = 0
 
