@@ -63,6 +63,9 @@ importers:
       nunjucks:
         specifier: ^3.2.4
         version: 3.2.4(chokidar@3.6.0)
+      vue:
+        specifier: ^3.0.0
+        version: 3.4.21(typescript@5.9.3)
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^4.3.0

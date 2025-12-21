@@ -13,6 +13,6 @@
     "skipDefaultLibCheck": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts"],
+  "include": ["src/**/*.ts", "client.d.ts"],
   "exclude": ["node_modules", "dist", "**/*.js"]
 }

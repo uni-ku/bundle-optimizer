@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { testUtil } from '../../utils'
-import { onMounted } from 'vue';
 
 onMounted(() => {
   testUtil('test')

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import BizTest from "../biz-test/biz-test.vue";
+import { onMounted } from 'vue'
 import { testUtil } from '../../utils'
-import { onMounted } from 'vue';
+import BizTest from '../biz-test/biz-test.vue'
 
 onMounted(() => {
   testUtil('use-test')
