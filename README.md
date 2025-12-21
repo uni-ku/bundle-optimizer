@@ -154,6 +154,31 @@ export default defineConfig({
 
 > 使用了 `@uni-helper/vite-plugin-uni-manifest` 的项目，修改 `manifest.config.ts` 的对应配置项即可。
 
+#### 3. (可选) 异步组件配置，获得 ts 类型标注
+
+本项目为异步组件配置 componentPlaceholder 时，提供了 ts 类型标注，类型文件为 `@uni-ku/bundle-optimizer/client`。
+
+可按需引用，下面分别提供 `三斜线指令` 与 `tsconfig` 两种配置方法。
+
+##### 三斜线指令
+在项目的入口文件（如 main.ts）顶部添加：
+```ts
+/// <reference types="@uni-ku/bundle-optimizer/client" />
+```
+> 但是一般不会在入口文件写这个类型引用，而是有专门的 `*.d.ts` 文件，内容同上。
+
+##### tsconfig 配置
+在业务项目的 `tsconfig` 配置文件的 `compilerOptions.types` 数组中添加：
+```json
+{
+  "compilerOptions": {
+    "types": [
+      "@uni-ku/bundle-optimizer/client"
+    ]
+  }
+}
+```
+
 ### ✨ 例子
 
 > 以下例子均以CLI创建项目为例, HBuilderX 项目与以上设置同理。
