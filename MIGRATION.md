@@ -66,6 +66,7 @@ defineOptions({
 <script>
 import SubComponent from '@/pages-sub/component.vue'
 
+// 同样支持支持 defineComponent
 export default {
   components: { SubComponent },
   // ✅ 添加配置

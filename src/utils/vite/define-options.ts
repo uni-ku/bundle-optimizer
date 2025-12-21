@@ -10,13 +10,17 @@ import { serializeObjectExpression } from '../ast'
 export const DEFINE_OPTIONS = 'defineOptions'
 export const COMPONENT_PLACEHOLDER = 'componentPlaceholder'
 
-export function filterMacro(stmts: Statement[] = []): CallExpression[] {
+export function filterMacro(stmts: (Statement | Node)[] = [], macro = DEFINE_OPTIONS): CallExpression[] {
   return stmts
     .map((raw: Node) => {
+      if (!raw)
+        return undefined
       let node = raw
       if (raw.type === 'ExpressionStatement')
         node = raw.expression
-      return isCallOf(node!, DEFINE_OPTIONS) ? node : undefined
+      else if (raw.type === 'ExportDefaultDeclaration')
+        node = raw.declaration
+      return isCallOf(node!, macro) ? node : undefined
     })
     .filter((node): node is CallExpression => !!node)
 }

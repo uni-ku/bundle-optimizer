@@ -1,3 +1,13 @@
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+defineComponent({
+  componentPlaceholder: {
+    SubDemo: 'view',
+  },
+})
+</script>
+
 <script setup lang="ts">
 import SubComponent from '@/pages-sub-async/component.vue'
 import SubDemo from '@/pages-sub-demo/index.vue'
@@ -8,7 +18,6 @@ import { getPages } from '@/lib/pages'
 defineOptions({
   componentPlaceholder: {
     SubComponent: 'view',
-    SubDemo: 'view',
   },
 })
 

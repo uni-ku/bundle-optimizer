@@ -46,7 +46,7 @@
   > <script>
   > import SubComponent from '@/pages-sub-async/component.vue'
   > import SubDemo from '@/pages-sub-demo/index.vue'
-  >
+  > // 同样支持支持 defineComponent
   > export default {
   >   components: {
   >     SubComponent,
@@ -245,6 +245,7 @@ defineOptions({
 import SubComponent from '@/pages-sub-async/component.vue'
 import SubDemo from '@/pages-sub-demo/index.vue'
 
+// 同样支持支持 defineComponent
 export default {
   components: {
     SubComponent,

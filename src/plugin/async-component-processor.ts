@@ -48,7 +48,12 @@ export function AsyncComponentProcessor(enableLogger: boolean): Plugin {
             // todo: 小程序端需要 kebab-case 风格的组件名称
             res[kebabCase(key.toString())] = kebabCase((val ?? 'view').toString())
           })
-          asyncComponents.set(getUniappOutputPath(id), res)
+          const path = getUniappOutputPath(id)
+          let oObj: Record<string, unknown> = {}
+          if (asyncComponents.has(path)) {
+            oObj = asyncComponents.get(path)!
+          }
+          asyncComponents.set(path, { ...oObj, ...res })
         }
       }
 
@@ -61,6 +66,9 @@ export function AsyncComponentProcessor(enableLogger: boolean): Plugin {
       //   checkDefaultExport(scriptAst.body)
 
       if (scriptAst) {
+        // 有些是使用 defineComponent 声明的
+        const macroNodes = filterMacro(scriptAst.body, 'defineComponent')
+        collectPlaceholder(macroNodes?.[0]?.arguments?.[0])
         const [defaultExport] = getDefaultExports(scriptAst)
         collectPlaceholder(defaultExport?.declaration)
       }
