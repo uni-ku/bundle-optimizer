@@ -88,7 +88,7 @@ export function decodeUriComponent(encodedURI: unknown) {
   }
 
   try {
-    // Try the built in decoder first
+    // Try the built-in decoder first
     return decodeURIComponent(encodedURI)
   }
   catch {

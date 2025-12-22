@@ -4,6 +4,7 @@ import process from 'node:process'
 import { logger } from '../common/Logger'
 import {
   COMPONENT_PLACEHOLDER,
+  DEFINE_COMPONENT,
   DEFINE_OPTIONS,
   filterMacro,
   getComponentPlaceholder,
@@ -67,14 +68,14 @@ export function AsyncComponentProcessor(enableLogger: boolean): Plugin {
 
       if (scriptAst) {
         // 有些是使用 defineComponent 声明的
-        const macroNodes = filterMacro(scriptAst.body, 'defineComponent')
+        const macroNodes = filterMacro(scriptAst.body, DEFINE_COMPONENT)
         collectPlaceholder(macroNodes?.[0]?.arguments?.[0])
         const [defaultExport] = getDefaultExports(scriptAst)
         collectPlaceholder(defaultExport?.declaration)
       }
       if (setupAst) {
-        const macroNodes = filterMacro(setupAst.body)
-        if (macroNodes.length > 1) {
+        const macroNodes = filterMacro(setupAst.body, DEFINE_OPTIONS)
+        if (macroNodes.length > 1) { // 多个 defineOptions 宏是不允许的
           throw new SyntaxError(`duplicate ${DEFINE_OPTIONS}() call`)
         }
         collectPlaceholder(macroNodes?.[0]?.arguments?.[0])

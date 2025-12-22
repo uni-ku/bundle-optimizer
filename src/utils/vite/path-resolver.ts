@@ -20,7 +20,6 @@ function matches(pattern: string | RegExp, source: string) {
 }
 
 /**
-/**
  * 创建一个基于 vite 配置的路径解析函数
  * @param config vite 配置
  * @returns 路径解析函数

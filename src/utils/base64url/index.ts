@@ -6,7 +6,7 @@ function encode(input: string | Buffer, encoding: BufferEncoding = 'utf8'): stri
     return fromBase64(input.toString('base64'))
   }
   return fromBase64(Buffer.from(input, encoding).toString('base64'))
-};
+}
 
 function decode(base64url: string, encoding: BufferEncoding = 'utf8'): string {
   return Buffer.from(toBase64(base64url), 'base64').toString(encoding)
