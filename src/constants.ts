@@ -35,3 +35,11 @@ export const ROOT_DIR = process.env.VITE_ROOT_DIR!
 if (!ROOT_DIR) {
   throw new Error('`ROOT_DIR` is not defined')
 }
+
+/**
+ * Uniapp 输出目录
+ */
+export const UNI_OUTPUT_DIR = process.env.UNI_OUTPUT_DIR!
+if (!UNI_OUTPUT_DIR) {
+  throw new Error('`UNI_OUTPUT_DIR` is not defined')
+}

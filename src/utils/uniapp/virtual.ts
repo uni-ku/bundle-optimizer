@@ -1,4 +1,8 @@
+import type { OutputChunk } from '../../type'
+import path from 'node:path'
+import { UNI_OUTPUT_DIR } from '../../constants'
 import base64url from '../base64url'
+import { getUniappOutputPath } from './common'
 
 export const uniPagePrefix = 'uniPage://' as const
 export const uniComponentPrefix = 'uniComponent://' as const
@@ -36,7 +40,7 @@ type ParseResult
   = | [true, string, 'page' | 'component']
     | [false, string, null]
 
-export function parseVirtualPath<T extends string>(virtualUrl?: T): ParseResult {
+export function parseVirtualPath<T extends string>(virtualUrl?: T | null): ParseResult {
   if (virtualUrl?.startsWith(uniPagePrefix)) {
     return [true, parseVirtualPagePath(virtualUrl), 'page']
   }
@@ -44,4 +48,31 @@ export function parseVirtualPath<T extends string>(virtualUrl?: T): ParseResult 
     return [true, parseVirtualComponentPath(virtualUrl), 'component']
   }
   return [false, virtualUrl ?? '', null]
+}
+
+export function checkUniComponentByChunk(chunk?: OutputChunk) {
+  if (!chunk || chunk.type !== 'chunk' || !chunk.facadeModuleId) {
+    return
+  }
+  // 如果是虚拟组件这里将会符合虚拟组件的特征
+  const facadeModuleId = chunk.facadeModuleId
+  const [is, maybePage, type] = parseVirtualPath(facadeModuleId)
+  if (!is || !path.isAbsolute(maybePage)) {
+    return
+  }
+  // 获得拟输出路径，无后缀
+  const outputPath = getUniappOutputPath(maybePage)
+
+  // 构建产物相对于构建根目录的文件路径名称
+  const fileName = chunk.fileName
+  const { name, dir, ext } = path.parse(fileName)
+  const todo = path.join(UNI_OUTPUT_DIR, dir, name)
+  if (todo !== outputPath) {
+    return
+  }
+  // 进一步判断是否是虚拟组件，虚拟组件
+  const moduleIds = chunk.moduleIds
+  if (moduleIds.includes(facadeModuleId) && moduleIds.some(item => (item.split('?')[0] === maybePage))) {
+    return { type, output: [todo, ext].filter(Boolean).join('.'), input: maybePage }
+  }
 }
