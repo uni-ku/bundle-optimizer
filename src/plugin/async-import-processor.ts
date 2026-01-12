@@ -2,6 +2,7 @@
 import type { Plugin } from 'vite'
 import process from 'node:process'
 import { logger } from '../common/Logger'
+import { checkUniComponentByChunk, isUniRenderDynamicImportOptions } from '../utils'
 
 /**
  * ### 异步引用语法多端支持
@@ -28,9 +29,15 @@ export function AsyncImportProcessor(enableLogger: boolean): Plugin {
       if (!isMP)
         return
 
-      return {
-        left: 'require.async(',
-        right: ')',
+      if (isUniRenderDynamicImportOptions(options)) {
+        // 略过对 uni 虚拟组件异步引用的干预
+        if (!options.targetChunk || !options.targetChunk.isDynamicEntry || checkUniComponentByChunk(options.targetChunk)) {
+          return
+        }
+        return {
+          left: 'require.async(',
+          right: ')',
+        }
       }
     },
   }
