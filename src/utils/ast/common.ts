@@ -1,4 +1,11 @@
-import type { ExportDefaultDeclaration, Node, ObjectExpression, Program, TemplateLiteral } from '@babel/types'
+import type {
+  CallExpression,
+  ExportDefaultDeclaration,
+  Node,
+  ObjectExpression,
+  Program,
+  TemplateLiteral,
+} from '@babel/types'
 import { walkAST } from 'ast-kit'
 
 export function getDefaultExports(program: Program) {
@@ -19,6 +26,36 @@ export function getDefaultExports(program: Program) {
   })
 
   return defaultExports
+}
+
+export function getDynamicImports(program: Program) {
+  const imports: Array<{
+    path: unknown
+    node: CallExpression
+    isStatic: boolean
+  }> = []
+
+  walkAST(program, {
+    enter(node) {
+      // 识别动态 import 语法： import(...)
+      // 在 Babel AST 中表现为 CallExpression，且 callee 类型为 Import
+      if (node.type === 'CallExpression' && node.callee.type === 'Import') {
+        const firstArg = node.arguments[0]
+
+        // 利用 parseValue 进行静态求值
+        // 这意味着 import('path/' + 'to/file') 这种拼接也能被解析出来
+        const value = parseValue(firstArg)
+        // 收集结果
+        imports.push({
+          path: value,
+          node,
+          // 如果解析出的是字符串，说明是纯静态路径；如果是 [Identifier: x] 说明依赖变量
+          isStatic: typeof value === 'string' && !String(value).includes('[Identifier:'),
+        })
+      }
+    },
+  })
+  return imports
 }
 
 export function serializeObjectExpression(node: ObjectExpression) {
@@ -156,7 +193,21 @@ export function parseTemplateLiteral(node: TemplateLiteral) {
     result += quasis[i].value.cooked
 
     if (i < expressions.length) {
-      result += `\${${expressions[i].type}}`
+      // result += `\${${expressions[i].type}}`
+      const expr = expressions[i]
+      // 尝试递归解析值
+      const value = parseValue(expr)
+
+      // 如果解析出了具体值（比如常量），直接拼进去
+      if (typeof value === 'string' || typeof value === 'number') {
+        result += value
+      }
+      else {
+        // 如果无法解析（是变量），则保留占位符，或者尝试读取变量名
+        // @ts-expect-error type guard
+        const name = expr.name || `\${${expr.type}}`
+        result += `[${name}]`
+      }
     }
   }
   return result
