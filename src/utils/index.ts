@@ -67,6 +67,46 @@ export function moduleIdProcessor(id: string, rootDir = ROOT_DIR, removeQuery = 
 }
 
 /**
+ * 获取两个字符串的“差”
+ */
+export function diffStrings(strA: string, strB: string) {
+  const lenA = strA.length
+  const lenB = strB.length
+
+  // 寻找公共前缀长度 (Prefix Length)
+  let p = 0
+  while (p < lenA && p < lenB && strA[p] === strB[p]) {
+    p++
+  }
+
+  // 寻找公共后缀长度 (Suffix Length)
+  // 注意：后缀扫描不能越过前缀的位置，避免重叠
+  let s = 0
+  while (
+    s < lenA - p
+    && s < lenB - p
+    && strA[lenA - 1 - s] === strB[lenB - 1 - s]
+  ) {
+    s++
+  }
+
+  return {
+    /** 公共前缀 */
+    prefix: strA.slice(0, p),
+    /** 公共后缀 */
+    suffix: strA.slice(lenA - s),
+    /** A 去掉前后公共部分后的剩余 */
+    diffA: strA.slice(p, lenA - s),
+    /** B 去掉前后公共部分后的剩余 */
+    diffB: strB.slice(p, lenB - s),
+    // -- 差异是在哪里开始的 --
+    start: p,
+    endA: lenA - s,
+    endB: lenB - s,
+  }
+}
+
+/**
  * 计算相对路径的调用层级
  * @param importer 引入者文件的路径
  * @param imported 被引入文件的路径
