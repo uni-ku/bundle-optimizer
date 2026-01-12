@@ -1,4 +1,4 @@
-import type { BuildOptions, IndexHtmlTransformContext, ModuleNode, splitVendorChunk } from 'vite'
+import type { BuildOptions, IndexHtmlTransformContext, ModuleNode, Plugin, splitVendorChunk } from 'vite'
 
 export type Prettify<T> = {
   [K in keyof T]: T[K]
@@ -9,7 +9,7 @@ type ExtractOutputOptions<T> = T extends (infer U)[] ? U : T extends undefined ?
 export type OutputOptions = ExtractOutputOptions<Exclude<BuildOptions['rollupOptions'], undefined>['output']>
 
 export type ManualChunksOption = OutputOptions['manualChunks']
-
+export type RenderDynamicImportOptions = Parameters<Plugin['renderDynamicImport']>[0]
 export type ModuleInfo = Pick<
   Exclude<ModuleNode['info'], undefined>,
 'id' | 'meta' | 'importers' | 'importedIds' | 'importedIdResolutions' | 'dynamicImporters' | 'dynamicallyImportedIds' | 'dynamicallyImportedIdResolutions'
