@@ -2,7 +2,10 @@
 import type { Plugin } from 'vite'
 import process from 'node:process'
 import { logger } from '../common/Logger'
-import { checkUniComponentByChunk, isUniRenderDynamicImportOptions } from '../utils'
+import {
+  isUniVirtualPath,
+  parseVirtualPath,
+} from '../utils'
 
 /**
  * ### 异步引用语法多端支持
@@ -26,18 +29,27 @@ export function AsyncImportProcessor(enableLogger: boolean): Plugin {
     name: 'async-import-processor',
     enforce: 'post', // 插件执行时机，在其他处理后执行
     renderDynamicImport(options) {
-      if (!isMP)
+      const targetModuleId = options.targetModuleId
+      if (!isMP || !targetModuleId)
         return
 
-      if (isUniRenderDynamicImportOptions(options)) {
-        // 略过对 uni 虚拟组件异步引用的干预
-        if (!options.targetChunk || !options.targetChunk.isDynamicEntry || checkUniComponentByChunk(options.targetChunk)) {
+      // 避免对 uni 虚拟组件异步引用的干预
+      if (isUniVirtualPath(targetModuleId))
+        return
+
+      const moduleInfo = this.getModuleInfo(targetModuleId)
+      for (const importer of moduleInfo?.importers ?? []) {
+        const [is, maybePath, type] = parseVirtualPath(importer)
+        // 这里说明业务中存在对一个 vue 组件的异步 import 的行为
+        // ! 这是不允许的，此处略过，不干预
+        if (is && targetModuleId === maybePath) {
           return
         }
-        return {
-          left: 'require.async(',
-          right: ')',
-        }
+      }
+
+      return {
+        left: 'require.async(',
+        right: ')',
       }
     },
   }
