@@ -1,4 +1,5 @@
 import process from 'node:process'
+import { diffStrings } from './utils'
 
 /**
  * `js`|`jsx`|`ts`|`uts`|`tsx`|`mjs`|`json`
@@ -44,6 +45,11 @@ if (!UNI_INPUT_DIR) {
   throw new Error('`UNI_INPUT_DIR` is not defined')
 }
 
+// UNI_INPUT_DIR 必须包含于 ROOT_DIR
+if (!(`${UNI_INPUT_DIR}/`).startsWith(ROOT_DIR)) {
+  throw new Error('`UNI_INPUT_DIR` need startsWith `ROOT_DIR`')
+}
+
 /**
  * Uniapp 输出目录
  */
@@ -51,3 +57,9 @@ export const UNI_OUTPUT_DIR = process.env.UNI_OUTPUT_DIR!
 if (!UNI_OUTPUT_DIR) {
   throw new Error('`UNI_OUTPUT_DIR` is not defined')
 }
+
+const pathDiff = diffStrings(ROOT_DIR, UNI_INPUT_DIR)
+/**
+ * uniapp 业务源码路径与项目根路径的差异
+ */
+export const UNI_SRC_DIFF_PATH = !pathDiff.diffA && !pathDiff.suffix && pathDiff.prefix === ROOT_DIR ? pathDiff.diffB : ''
