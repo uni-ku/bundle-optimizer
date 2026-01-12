@@ -1,8 +1,7 @@
 import type { ModuleInfo } from '../../type'
 import path from 'node:path'
-import process from 'node:process'
 import { moduleIdProcessor, parseQuerystring } from '..'
-import { ROOT_DIR, UNI_OUTPUT_DIR } from '../../constants'
+import { ROOT_DIR, UNI_INPUT_DIR, UNI_OUTPUT_DIR } from '../../constants'
 
 /**
  * 获取 uniapp 输出目录
@@ -10,7 +9,7 @@ import { ROOT_DIR, UNI_OUTPUT_DIR } from '../../constants'
  * @link https://github.com/chouchouji/vite-plugin-component-placeholder/blob/4509023c4ee07c2219ec62b106de013dbd3f2a9d/src/index.ts#L8
  */
 export function getUniappOutputPath(filePath: string) {
-  const relativePath = path.relative(process.env.UNI_INPUT_DIR!, filePath)
+  const relativePath = path.relative(UNI_INPUT_DIR, filePath)
   const { name, dir } = path.parse(relativePath)
 
   return path.join(UNI_OUTPUT_DIR, dir, name)

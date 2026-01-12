@@ -37,6 +37,14 @@ if (!ROOT_DIR) {
 }
 
 /**
+ * Uniapp 业务源码入口
+ */
+export const UNI_INPUT_DIR = process.env.UNI_INPUT_DIR!
+if (!UNI_INPUT_DIR) {
+  throw new Error('`UNI_INPUT_DIR` is not defined')
+}
+
+/**
  * Uniapp 输出目录
  */
 export const UNI_OUTPUT_DIR = process.env.UNI_OUTPUT_DIR!

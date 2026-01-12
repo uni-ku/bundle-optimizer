@@ -7,7 +7,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { parseManifestJsonOnce, parseMiniProgramPagesJson } from '@dcloudio/uni-cli-shared'
 import { logger } from '../common/Logger'
-import { EXT_RE, EXTNAME_JS_RE, ROOT_DIR } from '../constants'
+import { EXT_RE, EXTNAME_JS_RE, ROOT_DIR, UNI_INPUT_DIR } from '../constants'
 import { moduleIdProcessor as _moduleIdProcessor, normalizePath, parseQuerystring, parseVirtualPath } from '../utils'
 
 /**
@@ -15,7 +15,7 @@ import { moduleIdProcessor as _moduleIdProcessor, normalizePath, parseQuerystrin
  */
 export function SubPackagesOptimization(enableLogger: boolean): Plugin {
   const platform = process.env.UNI_PLATFORM
-  const inputDir = process.env.UNI_INPUT_DIR
+  const inputDir = UNI_INPUT_DIR
 
   if (!platform || !inputDir) {
     throw new Error('`UNI_INPUT_DIR` or `UNI_PLATFORM` is not defined')
@@ -62,7 +62,7 @@ export function SubPackagesOptimization(enableLogger: boolean): Plugin {
    * @description 将 moduleId 转换为相对于 inputDir 的路径并去除查询参数后缀
    */
   function moduleIdProcessor(id: string, removeQuery = true) {
-    return _moduleIdProcessor(id, process.env.UNI_INPUT_DIR, removeQuery)
+    return _moduleIdProcessor(id, UNI_INPUT_DIR, removeQuery)
   }
   /**
    * # id处理器
