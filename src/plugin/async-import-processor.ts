@@ -28,6 +28,13 @@ export function AsyncImportProcessor(enableLogger: boolean): Plugin {
 
   logger.info('[async-import] 异步导入处理器已启用', !enableLogger)
 
+  const resolvedByWhitelist = {
+    /**
+     * app 端部分来源的动态引用是允许的
+     */
+    app: ['uni:app-nvue-app-style'],
+  }
+
   return {
     name: 'async-import-processor',
     enforce: 'post', // 插件执行时机，在其他处理后执行
@@ -59,7 +66,7 @@ export function AsyncImportProcessor(enableLogger: boolean): Plugin {
           if (!resolved) {
             continue
           }
-          if (!isApp && !resolved.id.endsWith('.vue')) {
+          if (isApp ? resolvedByWhitelist.app.includes(resolved.resolvedBy) : !resolved.id.endsWith('.vue')) {
             continue
           }
           const { start, end } = dynamicImport.node
