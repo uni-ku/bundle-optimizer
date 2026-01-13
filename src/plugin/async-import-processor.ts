@@ -62,18 +62,12 @@ export function AsyncImportProcessor(enableLogger: boolean): Plugin {
           if (!isApp && !resolved.id.endsWith('.vue')) {
             continue
           }
-          const moduleInfo = this.getModuleInfo(resolved.id)
-          if (!moduleInfo?.id) {
-            continue
-          }
-          if (isApp || moduleInfo.importedIds.find(i => i.split('?')[0] === moduleInfo.id)) {
-            const { start, end } = dynamicImport.node
-            // 将 import(...) 替换为无副作用的占位符
-            // 替换为 Promise 占位符，防止业务代码 await 报错
-            s.overwrite(start, end, 'Promise.resolve({})')
-            hasChanged = true
-            logger.warn(`[async-import] 检测到 ${platform} 环境中存在非法的异步 import() 将禁止：${dynamicImport.path}`, false)
-          }
+          const { start, end } = dynamicImport.node
+          // 将 import(...) 替换为无副作用的占位符
+          // 替换为 Promise 占位符，防止业务代码 await 报错
+          s.overwrite(start, end, 'Promise.resolve({})')
+          hasChanged = true
+          logger.warn(`[async-import] 检测到 ${platform} 环境中存在非法的动态 import() 将禁止：${dynamicImport.path}`, false)
         }
         if (hasChanged) {
           return {
