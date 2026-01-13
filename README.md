@@ -16,8 +16,6 @@
 
 ### 🎏 功能与支持
 
-> ！<b style="color: red;">暂时没有对App平台做兼容性实现</b>
->
 > 适用于 Uniapp - CLI 或 HBuilderX 创建的 Vue3 项目
 
 - 分包优化
@@ -25,6 +23,11 @@
   > 允许使用 `import()` 语法，异步引用模块。
   >
   > 注意，这不是指静态导入，详见[此处](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/import)。
+  >
+  > `v2.0.4` 版本开始，插件实现了 **无感屏蔽** 非法的 `import()` 行为，同时会有 log 提示开发者迁移写法：
+  > - 小程序端对 vue 组件文件的 `import()` 是非法的
+  > - app端的编译格式是iife，无法使用`import()`语法，故均视为非法，将全量屏蔽
+  >
 - 组件异步跨包引用
   > 在vue 组件的 `defineOptions` 宏指令或者默认导出下配置 `componentPlaceholder`，eg:
   > ```vue
@@ -208,14 +211,17 @@ export default defineConfig({
 - `模块异步跨包调用` 是指在一个分包中引用另一个分包中的模块（不限主包与分包），这里的模块可以是 js/ts 模块(插件)。
 - `TODO:` 是否支持 json 文件？
 - `TODO:` 是否支持 vue 文件？当然，小程序环境引入 vue 文件一般是没有什么意义的。
-  > 目前实测，小程序环境下，千万不要对一个 vue 组件进行 `import()`
+  > ~~目前实测，小程序环境下，千万不要对一个 vue 组件进行 `import()`~~
+  > ~~这会导致这个 vue 组件对应的页面或者文件空白，和 **“分包优化”** 功能有些许冲突”，后续会尽可能填补这个缺陷~~
   >
-  > 这会导致这个 vue 组件对应的页面或者文件空白，和 **“分包优化”** 功能有些许冲突”，后续会尽可能填补这个缺陷
+  > 随着新版本的到来 `v2.0.4`，对非法的 `import()` 行为，实现了无感的屏蔽操作，同时会有 log 提示开发者迁移写法
+  >
+  > 可以不用在意可能会因为这个问题导致的页面空白问题了，如果还存在问题，欢迎反馈🙏，[详见此处](./MIGRATION.md#4-对非法的-import-行为实现了无感的屏蔽操作)
 
 可以直接使用 esm 的原生异步导入语法 `import()` 来实现模块的异步引入。
 - h5：原生支持
 - mp：转译成 `require.async()`
-- app：TODO: 待兼容
+- app：app端的编译格式是 `iife`，无法使用 `import()` 语法，本插件将全量屏蔽 `import()` 行为
 - 其他 mp：TODO: 未做兼容测试，欢迎反馈
 
 ```js
@@ -224,12 +230,12 @@ await import('@/pages-sub-async/async-plugin/index').then((res) => {
   console.log(res?.AsyncPlugin()) // 该插件导出了一个具名函数
 })
 
-// vue 文件 异步引入（页面文件）❌ 暂时不要这样使用，不要这样引用组件文件
+// vue 文件 异步引入（页面文件）❌ 不要这样使用，不要这样引用组件文件
 import('@/pages-sub-async/index.vue').then((res) => {
   console.log(res.default || res)
 })
 
-// vue 文件 异步引入（组件文件）❌ 暂时不要这样使用，不要这样引用组件文件
+// vue 文件 异步引入（组件文件）❌ 不要这样使用，不要这样引用组件文件
 import('@/pages-sub-async/async-component/index.vue').then((res) => {
   console.log(res.default || res)
 })
