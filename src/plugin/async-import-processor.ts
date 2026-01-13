@@ -32,7 +32,7 @@ export function AsyncImportProcessor(enableLogger: boolean): Plugin {
     name: 'async-import-processor',
     enforce: 'post', // 插件执行时机，在其他处理后执行
     async transform(code, id, options) {
-      if (!isMP || isApp || !code.includes('import('))
+      if (!code.includes('import(') || (!isMP && !isApp))
         return
 
       const platform = isMP ? '小程序' : 'APP'
