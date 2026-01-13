@@ -19,13 +19,13 @@ onMounted(async () => {
     res.AsyncPluginDemo().run()
   })
 
-  // TODO: 对 vue 文件的这种引用会和分包优化的一个行为有冲突，导致目标组件对应的页面、组件空白
-  // import('@/pages-sub-demo/index.vue').then((res) => {
-  //   console.log('[async-import-component]', res.default)
-  //   setTimeout(() => {
-  //     result.value = res.default
-  //   }, 1000)
-  // })
+  // TODO: 对 vue 文件的这种引用是非法的，插件将会自动屏蔽
+  import('@/pages-sub-demo/index.vue').then((res) => {
+    console.log('[async-import-component]', res.default)
+    setTimeout(() => {
+      result.value = res.default
+    }, 1000)
+  })
   await import('@/pages-sub-async/plugin').then((res) => {
     res.AsyncPluginDemo().run()
   })
