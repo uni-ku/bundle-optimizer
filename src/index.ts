@@ -1,6 +1,7 @@
 import type { PluginOption } from 'vite'
 import type { IOptions } from './type'
 import fs from 'node:fs'
+import process from 'node:process'
 import { name } from '../package.json'
 import { logger } from './common/Logger'
 import { ParseOptions } from './common/ParseOptions'
@@ -33,6 +34,10 @@ export default (options: IOptions = {}): PluginOption => {
       fs.writeFileSync(logToFile as string, `${line}\n`, { flag: 'a' })
     }
   }
+
+  const platform = process.env.UNI_PLATFORM
+
+  logger.info(`[main] 当前构建平台: ${platform}`, !true)
 
   return [
     {

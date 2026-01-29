@@ -23,8 +23,11 @@ export function AsyncImportProcessor(enableLogger: boolean): Plugin {
   const isMP = platform?.startsWith('mp')
   /** 是否H5 */
   const isH5 = platform === 'h5'
-  /** 是否为app */
-  const isApp = platform === 'app'
+  /**
+   * 是否为app
+   * @description 鸿蒙平台下会输出 `app-harmony`；android、ios 均输出 `app`
+   */
+  const isApp = platform?.startsWith('app')
 
   logger.info('[async-import] 异步导入处理器已启用', !enableLogger)
 
@@ -59,6 +62,7 @@ export function AsyncImportProcessor(enableLogger: boolean): Plugin {
         // TODO: 小程序端，将业务中所有对组件文件的异步引用都屏蔽，虚拟路径除外
         // TODO: app端，将业务中所有的异步引用都屏蔽，虚拟路径除外
         for (const dynamicImport of dynamicImports) {
+          logger.info(`[async-import] dynamicImport: ${JSON.stringify(dynamicImport, null, 2)}`, true)
           if (typeof dynamicImport.path !== 'string' || !dynamicImport.node.start || !dynamicImport.node.end) {
             continue
           }
