@@ -1,4 +1,4 @@
-import { createEdgeRegex } from '..'
+import { createEdgeRegex, slash } from '..'
 
 interface FileSystemNode {
   id: string
@@ -77,7 +77,8 @@ export function buildFileSystemTree(paths: string[], flattenSingleDir: boolean =
     children: [],
   }
 
-  for (const p of paths) {
+  for (let p of paths) {
+    p = slash(p)
     // 统一处理路径，移除开头和结尾的斜杠
     // const parts = p.startsWith(separator) ? p.substring(1).split(separator) : p.split(separator);
     const parts = p.replace(createEdgeRegex(separator), '').split(separator)

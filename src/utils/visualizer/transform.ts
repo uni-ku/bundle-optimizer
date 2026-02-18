@@ -1,7 +1,7 @@
 import type { ManualChunkMeta } from '../../type'
 import type { GraphRestrictArea, ViteNode, ViteNodeLink, ViteRestrictNode } from './type'
 import path from 'node:path'
-import { parseQuerystring } from '..'
+import { parseQuerystring, slash } from '..'
 import { parseVirtualPath } from '../uniapp'
 import { createRestrictAreaSearcher } from './helper'
 
@@ -111,12 +111,13 @@ export const transformDataForECharts: TransformDataFunction = <T extends ViteRes
   // 收集所有节点和链接
   // =================================================================
   const moduleIds = Array.from(pluginContext.getModuleIds())
-  for (const id of moduleIds) {
+  for (let id of moduleIds) {
     const moduleInfo = pluginContext.getModuleInfo(id)
 
     if (!moduleInfo)
       continue
 
+    id = slash(id)
     // 创建或更新当前模块的节点 (Source Node)
     if (!nodeMap.has(id)) {
       const { fileName: name, name: label } = parseModuleId(id)
@@ -144,12 +145,13 @@ export const transformDataForECharts: TransformDataFunction = <T extends ViteRes
     }
 
     // 处理静态依赖 (Static Imports)
-    for (const targetId of moduleInfo.importedIds) {
+    for (let targetId of moduleInfo.importedIds) {
       // 确保目标节点也存在于 nodeMap 中
       if (!nodeMap.has(targetId)) {
         // 如果目标节点不存在，创建一个基础表示
         const { fileName: name, name: label } = parseModuleId(targetId)
         const targetModuleInfo = pluginContext.getModuleInfo(targetId)
+        targetId = slash(targetId)
         const [area, matcheRes] = restrictAreaSearcher(targetId)
         if (typeof matcheRes === 'string') {
           nodeMap.set(targetId, execOnSet({
@@ -181,10 +183,11 @@ export const transformDataForECharts: TransformDataFunction = <T extends ViteRes
     }
 
     // 处理动态依赖 (Dynamic Imports)
-    for (const targetId of moduleInfo.dynamicallyImportedIds) {
+    for (let targetId of moduleInfo.dynamicallyImportedIds) {
       if (!nodeMap.has(targetId)) {
         const { fileName: name, name: label } = parseModuleId(targetId)
         const targetModuleInfo = pluginContext.getModuleInfo(targetId)
+        targetId = slash(targetId)
         const [area, matcheRes] = restrictAreaSearcher(targetId)
         if (typeof matcheRes === 'string') {
           nodeMap.set(targetId, execOnSet({

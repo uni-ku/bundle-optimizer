@@ -8,6 +8,7 @@ import { ParseOptions } from './common/ParseOptions'
 import AsyncComponentProcessor from './plugin/async-component-processor'
 import AsyncImportProcessor from './plugin/async-import-processor'
 import SubPackagesOptimization from './plugin/subpackages-optimization'
+import { depGraphPlugin } from './plugin/vite-plugin-dep-graph'
 import { ensureDirectoryExists, initializeVitePathResolver } from './utils'
 
 export default (options: IOptions = {}): PluginOption => {
@@ -46,6 +47,7 @@ export default (options: IOptions = {}): PluginOption => {
         initializeVitePathResolver(config)
       },
     },
+    depGraphPlugin(),
     // 分包优化
     parse.enable.optimization && SubPackagesOptimization(parse.logger.optimization),
     // js/ts插件的异步调用
