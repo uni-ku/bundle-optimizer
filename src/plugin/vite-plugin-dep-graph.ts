@@ -33,9 +33,12 @@ export function depGraphPlugin(): Plugin {
 
       const graphData = transformDataForECharts(this)
       graphData.nodes.forEach((node) => {
-        const targetIndex = categories?.findIndex(category => node.id.startsWith(`${category}/`) || node.id === category)
-        if (targetIndex !== -1 && targetIndex !== undefined) {
-          node.category = targetIndex
+        for (const category of (categories ?? [])) {
+          if (node.id.startsWith(`${category}/`) || node.id === category) {
+            node.categoryIndex = categories?.indexOf(category)
+            node.category = category
+            break
+          }
         }
       })
 
