@@ -88,6 +88,10 @@ pnpm add -D @uni-ku/bundle-optimizer
 |-------------|-----------------------|---------|----------------------------------------------------------------------------------------------------------|
 | logger      | `boolean`\|`string[]` | `false` | 插件日志输出总配置，`true`时启用所有子插件的日志功能；`string[]`时可具体启用部分插件的日志，可以是`optimization`、`async-component`、`async-import` |
 
+| 参数-[optimization] | 类型      | 默认值    | 描述                                                        |
+|-------------------|---------|--------|-----------------------------------------------------------|
+| optimization.normalizeVueEntityModule | `boolean` | `true` | 控制“vue 实体模块规整”逻辑是否生效，关闭后不再将该类模块规整为 `*-vendor`；如因分包优化导致循环依赖，可尝试关闭此配置 |
+
 #### 1. 引入 `@uni-ku/bundle-optimizer`
 
 - CLI: `直接编写` 根目录下的 vite.config.*
@@ -106,8 +110,10 @@ export default defineConfig({
     Uni(),
     Optimization({
       enable: true,
-      dts: true,
       logger: false,
+      optimization: {
+        normalizeVueEntityModule: true,
+      },
     }),
     // 以上配置都是默认配置，可以直接不传任何配置
     // Optimization(),
@@ -133,6 +139,9 @@ export default defineConfig({
         'optimization': true,
         'async-import': true,
         'async-component': true,
+      },
+      optimization: {
+        normalizeVueEntityModule: true,
       },
       // 也可以传递具体的子插件的字符串列表，如 ['optimization', 'async-import', 'async-component']，开启部分插件的log功能
       logger: true, // 默认 false

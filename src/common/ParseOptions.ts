@@ -1,4 +1,4 @@
-import type { Enable, IOptions } from '../type'
+import type { Enable, IOptions, OptimizationOptions } from '../type'
 
 export class ParseOptions {
   options: IOptions
@@ -31,5 +31,13 @@ export class ParseOptions {
       : origin
 
     return Object.fromEntries(_.map(item => [item, (temp || []).includes(item)])) as Record<Enable, boolean>
+  }
+
+  get optimization(): Required<OptimizationOptions> {
+    const { optimization: origin = {} } = this.options
+
+    return {
+      normalizeVueEntityModule: origin.normalizeVueEntityModule ?? true,
+    }
   }
 }

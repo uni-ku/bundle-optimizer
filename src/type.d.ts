@@ -28,6 +28,15 @@ export interface ISubPkgsInfo {
 
 type Enable = 'optimization' | 'async-component' | 'async-import'
 
+export interface OptimizationOptions {
+  /**
+   * 是否启用 vue 实体模块规整逻辑
+   *
+   * @description 默认为 true。关闭后将跳过 `*-vendor` 的规整逻辑
+   */
+  normalizeVueEntityModule?: boolean
+}
+
 export interface IOptions {
   /**
    * 插件功能开关（可选）
@@ -39,6 +48,10 @@ export interface IOptions {
    * log 控制，默认不启用，为false
    */
   logger?: Prettify<boolean | Enable[]>
+  /**
+   * 分包优化插件的细粒度配置
+   */
+  optimization?: OptimizationOptions
   /**
    * 日志落盘
    * ---

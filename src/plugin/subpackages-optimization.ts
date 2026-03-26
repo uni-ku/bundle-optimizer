@@ -2,7 +2,7 @@
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable node/prefer-global/process */
 import type { Plugin } from 'vite'
-import type { ISubPkgsInfo, ManualChunkMeta, ManualChunksOption, ModuleInfo } from '../type'
+import type { ISubPkgsInfo, ManualChunkMeta, ManualChunksOption, ModuleInfo, OptimizationOptions } from '../type'
 import fs from 'node:fs'
 import path from 'node:path'
 import { parseManifestJsonOnce, parseMiniProgramPagesJson } from '@dcloudio/uni-cli-shared'
@@ -13,9 +13,10 @@ import { moduleIdProcessor as _moduleIdProcessor, normalizePath, parseQuerystrin
 /**
  * ### uniapp 分包优化插件
  */
-export function SubPackagesOptimization(enableLogger: boolean): Plugin {
+export function SubPackagesOptimization(enableLogger: boolean, options: Required<OptimizationOptions>): Plugin {
   const platform = process.env.UNI_PLATFORM
   const inputDir = UNI_INPUT_DIR
+  const { normalizeVueEntityModule } = options
 
   if (!platform || !inputDir) {
     throw new Error('`UNI_INPUT_DIR` or `UNI_PLATFORM` is not defined')
@@ -24,8 +25,8 @@ export function SubPackagesOptimization(enableLogger: boolean): Plugin {
   // #region 分包优化参数获取
   const manifestJson = parseManifestJsonOnce(inputDir)
   const platformOptions = manifestJson[platform] || {}
-  const optimization = platformOptions.optimization || {}
-  process.env.UNI_OPT_TRACE = `${!!optimization.subPackages}`
+  const platformOptimization = platformOptions.optimization || {}
+  process.env.UNI_OPT_TRACE = `${!!platformOptimization.subPackages}`
 
   const pagesJsonPath = path.resolve(inputDir, 'pages.json')
   const jsonStr = fs.readFileSync(pagesJsonPath, 'utf8')
@@ -329,7 +330,7 @@ export function SubPackagesOptimization(enableLogger: boolean): Plugin {
               }
 
               // TODO: 绝对路径是 monorepo 项目结构下的三方依赖库的特点，或者其他情况，这里暂时不做处理
-              if (isVueEntity(moduleInfo) && !path.isAbsolute(clearIdForRoot)) {
+              if (normalizeVueEntityModule && isVueEntity(moduleInfo) && !path.isAbsolute(clearIdForRoot)) {
                 const targetId = path.isAbsolute(clearId) ? clearIdForRoot : clearId
                 const originalTarget = targetId.replace(EXT_RE, '')
                 // 规整没处理好的 vue 实体模块
