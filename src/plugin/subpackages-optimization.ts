@@ -5,10 +5,10 @@ import type { Plugin } from 'vite'
 import type { ISubPkgsInfo, ManualChunkMeta, ManualChunksOption, ModuleInfo, OptimizationOptions } from '../type'
 import fs from 'node:fs'
 import path from 'node:path'
-import { parseManifestJsonOnce, parseMiniProgramPagesJson } from '@dcloudio/uni-cli-shared'
 import { logger } from '../common/Logger'
 import { EXT_RE, EXTNAME_JS_RE, ROOT_DIR, UNI_INPUT_DIR } from '../constants'
 import { moduleIdProcessor as _moduleIdProcessor, normalizePath, parseQuerystring, parseVirtualPath } from '../utils'
+import { parseManifestJsonOnce, parseMiniProgramPagesJson } from '../utils/uniapp'
 
 /**
  * ### uniapp 分包优化插件
