@@ -22,7 +22,6 @@
   "devDependencies": {
     "@dcloudio/types": "catalog:uniapp",
     "@dcloudio/uni-automator": "catalog:uniapp",
-    "@dcloudio/uni-cli-shared": "catalog:uniapp",
     "@dcloudio/vite-plugin-uni": "catalog:uniapp",
     "@https-enable/types": "^0.1.1",
     "@types/lodash": "catalog:",
