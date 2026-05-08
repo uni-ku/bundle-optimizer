@@ -35,12 +35,20 @@ interface MiniProgramAppJson {
 
 const manifestJsonCache = new Map<string, JsonObject>()
 
+/**
+ * 是否为普通编译目标
+ * - 目前有特殊编译目标 uni_modules 和 ext-api
+ */
+function isNormalCompileTarget() {
+  return !process.env.UNI_COMPILE_TARGET
+}
+
 export function parseManifestJson(inputDir: string): JsonObject {
   const filename = path.join(inputDir, 'manifest.json')
 
   if (!fs.existsSync(filename)) {
     // 特殊编译目标可能没有完整项目配置，缺失 manifest 时按空配置处理
-    if (process.env.UNI_COMPILE_TARGET)
+    if (!isNormalCompileTarget())
       return {}
 
     throw new Error(`[bundle-optimizer] manifest.json not found: ${filename}`)
@@ -127,6 +135,7 @@ function parseJsonLike<T = JsonObject>(
   filename: string,
   { platform = process.env.UNI_PLATFORM, preprocess = false }: { platform?: string, preprocess?: boolean } = {},
 ): T {
+  // 先去除注释，再去除尾随逗号，最后进行 JSON.parse
   const content = stripTrailingCommas(stripJsonComments(preprocess ? preprocessConditionalJson(jsonStr, platform) : jsonStr))
 
   try {
@@ -137,6 +146,14 @@ function parseJsonLike<T = JsonObject>(
   }
 }
 
+/**
+ * json 文本平台条件编译预处理
+ * - 支持条件编译指令 #if、#ifdef、#ifndef、#else、#endif
+ * @param jsonStr
+ * @param platform 平台标识，默认为环境变量 UNI_PLATFORM
+ * @returns 预处理后的 json 文本
+ * @see https://uniapp.dcloud.net.cn/tutorial/platform.html
+ */
 function preprocessConditionalJson(jsonStr: string, platform = process.env.UNI_PLATFORM) {
   const context = createConditionalContext(platform)
   const stack: Array<{ parentActive: boolean, matched: boolean, active: boolean }> = []
@@ -203,6 +220,10 @@ function isActive(stack: Array<{ active: boolean }>) {
   return stack.every(item => item.active)
 }
 
+/**
+ * 根据平台标识创建条件编译上下文
+ * @param platform
+ */
 function createConditionalContext(platform = '') {
   const normalizedPlatform = normalizeConditionKey(platform)
   const context = new Set<string>(['VUE3'])
@@ -234,6 +255,12 @@ function createConditionalContext(platform = '') {
   return context
 }
 
+/**
+ * 评估条件表达式
+ * - 支持逻辑与 &&、逻辑或 ||、逻辑非 !、括号 ()，以及平台标识符
+ * @param expression 条件表达式字符串
+ * @param context 条件编译上下文，包含当前平台和相关标识符
+ */
 function evaluateCondition(expression: string, context: Set<string>) {
   const tokens = expression.match(/[()!]|\|\||&&|[\w-]+/g) || []
   let index = 0
@@ -290,6 +317,9 @@ function normalizeConditionKey(name: string) {
   return name.replace(/-/g, '_').toUpperCase()
 }
 
+/**
+ * 去除 JSON 字符串中的注释
+ */
 function stripJsonComments(source: string) {
   let result = ''
   let inString = false
@@ -343,6 +373,10 @@ function stripJsonComments(source: string) {
   return result
 }
 
+/**
+ * 去除 JSON 字符串中的尾随逗号
+ * @description jsonc 允许对象和数组中存在尾随逗号，但 JSON.parse 不支持，因此需要预处理去除
+ */
 function stripTrailingCommas(source: string) {
   let result = ''
   let inString = false
