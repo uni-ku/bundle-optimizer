@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { ASSETS_DIR_RE, EXT_RE, ROOT_DIR, SRC_DIR_RE } from '../constants'
+import { getUniPaths } from '../common/UniPaths'
+import { ASSETS_DIR_RE, EXT_RE, SRC_DIR_RE } from '../constants'
 import { normalizePath, slash } from './path'
 import * as querystring from './query-string'
 
@@ -39,9 +40,13 @@ export function ensureDirectoryExists(filePath: string) {
   }
 }
 
-/** 路径处理器 | 去除`rootDir`前缀路径和查询参数 | `rootDir`默认为项目根目录 */
-export function moduleIdProcessor(id: string, rootDir = ROOT_DIR, removeQuery = true) {
-  rootDir = normalizePath(rootDir)
+/**
+ * 路径处理器
+ *
+ * @description 去除 `rootDir` 前缀路径和查询参数；未传 `rootDir` 时读取 `VITE_ROOT_DIR`
+ */
+export function moduleIdProcessor(id: string, rootDir?: string, removeQuery = true) {
+  rootDir = normalizePath(rootDir ?? getUniPaths().rootDir)
   // 确保 rootDir 以斜杠结尾
   if (!rootDir.endsWith('/'))
     rootDir += '/'

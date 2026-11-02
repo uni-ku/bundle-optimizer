@@ -1,6 +1,6 @@
 import type { OutputChunk } from '../../type'
 import path from 'node:path'
-import { UNI_INPUT_DIR, UNI_OUTPUT_DIR } from '../../constants'
+import { getUniPaths } from '../../common/UniPaths'
 import base64url from '../base64url'
 import { getUniappOutputPath } from './common'
 
@@ -61,7 +61,7 @@ export function checkUniComponentByChunk(chunk?: OutputChunk) {
     return
   }
   if (!path.isAbsolute(maybePath)) {
-    maybePath = path.join(UNI_INPUT_DIR, maybePath)
+    maybePath = path.join(getUniPaths().inputDir, maybePath)
   }
   // 获得拟输出路径，无后缀
   const outputPath = getUniappOutputPath(maybePath)
@@ -69,7 +69,7 @@ export function checkUniComponentByChunk(chunk?: OutputChunk) {
   // 构建产物相对于构建根目录的文件路径名称
   const fileName = chunk.fileName
   const { name, dir, ext } = path.parse(fileName)
-  const todo = path.join(UNI_OUTPUT_DIR, dir, name)
+  const todo = path.join(getUniPaths().outputDir, dir, name)
   if (todo !== outputPath) {
     return
   }

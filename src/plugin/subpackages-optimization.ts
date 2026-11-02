@@ -6,20 +6,23 @@ import type { ISubPkgsInfo, ManualChunkMeta, ManualChunksOption, ModuleInfo, Opt
 import fs from 'node:fs'
 import path from 'node:path'
 import { logger } from '../common/Logger'
-import { EXT_RE, EXTNAME_JS_RE, ROOT_DIR, UNI_INPUT_DIR } from '../constants'
+import { getUniPaths } from '../common/UniPaths'
+import { EXT_RE, EXTNAME_JS_RE } from '../constants'
 import { moduleIdProcessor as _moduleIdProcessor, normalizePath, parseQuerystring, parseVirtualPath } from '../utils'
 import { parseManifestJsonOnce, parseMiniProgramPagesJson } from '../utils/uniapp'
 
 /**
  * ### uniapp 分包优化插件
+ *
+ * @description 创建插件时会读取 uni-app 路径，并要求 `UNI_PLATFORM` 已完成初始化
  */
 export function SubPackagesOptimization(enableLogger: boolean, options: Required<OptimizationOptions>): Plugin {
   const platform = process.env.UNI_PLATFORM
-  const inputDir = UNI_INPUT_DIR
+  const { rootDir, inputDir } = getUniPaths()
   const { normalizeVueEntityModule } = options
 
-  if (!platform || !inputDir) {
-    throw new Error('`UNI_INPUT_DIR` or `UNI_PLATFORM` is not defined')
+  if (!platform) {
+    throw new Error('[bundle-optimizer] `UNI_PLATFORM` is not defined')
   }
 
   // #region 分包优化参数获取
@@ -63,7 +66,7 @@ export function SubPackagesOptimization(enableLogger: boolean, options: Required
    * @description 将 moduleId 转换为相对于 inputDir 的路径并去除查询参数后缀
    */
   function moduleIdProcessor(id: string, removeQuery = true) {
-    return _moduleIdProcessor(id, UNI_INPUT_DIR, removeQuery)
+    return _moduleIdProcessor(id, inputDir, removeQuery)
   }
   /**
    * # id处理器
@@ -80,7 +83,7 @@ export function SubPackagesOptimization(enableLogger: boolean, options: Required
     { from: 'main' | 'node_modules', clearId: string }
     | { from: 'sub', clearId: string, pkgRoot: string }
     | undefined => {
-    let root = normalizePath(ROOT_DIR)
+    let root = normalizePath(rootDir)
     if (!root.endsWith('/'))
       root = `${root}/`
 
