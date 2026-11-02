@@ -81,12 +81,27 @@ describe('getUniPaths', () => {
     })
   })
 
-  it('环境变量变化后重新解析路径', () => {
+  it('输出目录变化后重新解析路径', () => {
     const rootDir = path.resolve('/project')
     setUniPaths(rootDir, path.resolve('/project/src'), path.resolve('/project/dist'))
     expect(getUniPaths().outputDir).toBe(slash(path.resolve('/project/dist')))
 
     process.env.UNI_OUTPUT_DIR = path.resolve('/project/other')
     expect(getUniPaths().outputDir).toBe(slash(path.resolve('/project/other')))
+  })
+
+  it('源码目录变化后重新解析路径', () => {
+    const rootDir = path.resolve('/project')
+    setUniPaths(rootDir, path.resolve('/project/src'), path.resolve('/project/dist'))
+    expect(getUniPaths()).toMatchObject({
+      inputDir: slash(path.resolve('/project/src')),
+      srcDiffPath: 'src',
+    })
+
+    process.env.UNI_INPUT_DIR = path.resolve('/project/app')
+    expect(getUniPaths()).toMatchObject({
+      inputDir: slash(path.resolve('/project/app')),
+      srcDiffPath: 'app',
+    })
   })
 })
