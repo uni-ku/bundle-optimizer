@@ -6,7 +6,7 @@ import type { ISubPkgsInfo, ManualChunkMeta, ManualChunksOption, ModuleInfo, Opt
 import fs from 'node:fs'
 import path from 'node:path'
 import { logger } from '../common/Logger'
-import { getUniPaths } from '../common/UniPaths'
+import { tryGetUniPaths } from '../common/UniPaths'
 import { EXT_RE, EXTNAME_JS_RE } from '../constants'
 import { moduleIdProcessor as _moduleIdProcessor, normalizePath, parseQuerystring, parseVirtualPath } from '../utils'
 import { parseManifestJsonOnce, parseMiniProgramPagesJson } from '../utils/uniapp'
@@ -16,9 +16,13 @@ import { parseManifestJsonOnce, parseMiniProgramPagesJson } from '../utils/uniap
  *
  * @description 创建插件时会读取 uni-app 路径，并要求 `UNI_PLATFORM` 已完成初始化
  */
-export function SubPackagesOptimization(enableLogger: boolean, options: Required<OptimizationOptions>): Plugin {
+export function SubPackagesOptimization(enableLogger: boolean, options: Required<OptimizationOptions>): Plugin | undefined {
+  const paths = tryGetUniPaths()
+  // 环境变量尚未初始化（如 unh 预生成配置文件的子进程）时不创建插件，待真实构建再创建
+  if (!paths)
+    return
+  const { rootDir, inputDir } = paths
   const platform = process.env.UNI_PLATFORM
-  const { rootDir, inputDir } = getUniPaths()
   const { normalizeVueEntityModule } = options
 
   if (!platform) {

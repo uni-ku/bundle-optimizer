@@ -2,7 +2,7 @@ import path from 'node:path'
 import process from 'node:process'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { slash } from '../utils/path'
-import { getUniPaths } from './UniPaths'
+import { getUniPaths, tryGetUniPaths } from './UniPaths'
 
 const envNames = ['VITE_ROOT_DIR', 'UNI_INPUT_DIR', 'UNI_OUTPUT_DIR'] as const
 const originalEnv = Object.fromEntries(envNames.map(name => [name, process.env[name]]))
@@ -44,6 +44,20 @@ describe('getUniPaths', () => {
     const plugins = Optimization({ enable: false })
 
     expect(Array.isArray(plugins)).toBe(true)
+  })
+
+  it('环境变量尚未初始化时静默跳过路径解析', async () => {
+    const { default: Optimization } = await import('../index')
+
+    expect(tryGetUniPaths()).toBeUndefined()
+    expect(() => Optimization()).not.toThrow()
+  })
+
+  it('路径环境变量已初始化但源码目录越界时仍抛出错误', async () => {
+    const { default: Optimization } = await import('../index')
+    setUniPaths(path.resolve('/project'), path.resolve('/project-x/src'), path.resolve('/project/dist'))
+
+    expect(() => Optimization()).toThrow('`UNI_INPUT_DIR` must be inside `VITE_ROOT_DIR`')
   })
 
   it('缺少 VITE_ROOT_DIR 时抛出明确错误', () => {

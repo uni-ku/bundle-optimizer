@@ -69,3 +69,13 @@ export function getUniPaths(): UniPaths {
   cacheKey = nextCacheKey
   return cachedPaths
 }
+
+/**
+ * 尝试获取当前 uni-app 构建路径
+ *
+ * @description 环境变量尚未初始化时返回 `undefined`，用于跳过非构建阶段的路径校验；目录配置非法时仍会抛出
+ */
+export function tryGetUniPaths(): UniPaths | undefined {
+  const missingEnv = !['VITE_ROOT_DIR', 'UNI_INPUT_DIR', 'UNI_OUTPUT_DIR'].every(name => process.env[name])
+  return missingEnv ? undefined : getUniPaths()
+}
