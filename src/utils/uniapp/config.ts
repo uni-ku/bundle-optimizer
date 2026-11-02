@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
+import { slash } from '../path'
 
 type JsonObject = Record<string, any>
 
@@ -98,7 +99,7 @@ export function parseMiniProgramPagesJson(
     else {
       subPackages.forEach(({ root, pages = [] }) => {
         pages.forEach((page) => {
-          appJson.pages.push(normalizePath(path.join(root, page.path)))
+          appJson.pages.push(slash(path.join(root, page.path)))
         })
       })
     }
@@ -419,8 +420,4 @@ function stripTrailingCommas(source: string) {
   }
 
   return result
-}
-
-function normalizePath(filePath: string) {
-  return filePath.replace(/\\/g, '/')
 }
