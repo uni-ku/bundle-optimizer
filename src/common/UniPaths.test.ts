@@ -104,4 +104,13 @@ describe('getUniPaths', () => {
       srcDiffPath: 'app',
     })
   })
+
+  it('根目录变化后重新校验源码目录', () => {
+    const rootDir = path.resolve('/project')
+    setUniPaths(rootDir, path.resolve('/project/src'), path.resolve('/project/dist'))
+    expect(getUniPaths().rootDir).toBe(slash(rootDir))
+
+    process.env.VITE_ROOT_DIR = path.resolve('/other')
+    expect(() => getUniPaths()).toThrow('`UNI_INPUT_DIR` must be inside `VITE_ROOT_DIR`')
+  })
 })
