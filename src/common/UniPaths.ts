@@ -33,7 +33,11 @@ function requireEnv(name: string) {
 function isInsideDirectory(rootDir: string, directory: string) {
   const relativePath = path.relative(rootDir, directory)
   return relativePath === ''
-    || (!path.isAbsolute(relativePath) && !relativePath.startsWith(`..${path.sep}`))
+    || (
+      relativePath !== '..'
+      && !path.isAbsolute(relativePath)
+      && !relativePath.startsWith(`..${path.sep}`)
+    )
 }
 
 /**

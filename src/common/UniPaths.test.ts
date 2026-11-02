@@ -60,6 +60,13 @@ describe('getUniPaths', () => {
     expect(() => getUniPaths()).toThrow('`UNI_INPUT_DIR` must be inside `VITE_ROOT_DIR`')
   })
 
+  it('拒绝将项目根目录的上一级目录作为源码目录', () => {
+    const rootDir = path.resolve('/project/app')
+    setUniPaths(rootDir, path.dirname(rootDir), path.join(rootDir, 'dist'))
+
+    expect(() => getUniPaths()).toThrow('`UNI_INPUT_DIR` must be inside `VITE_ROOT_DIR`')
+  })
+
   it('解析路径并计算源码目录差异', () => {
     const rootDir = path.resolve('/project')
     const inputDir = path.resolve('/project/../project/src')
