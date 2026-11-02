@@ -1,22 +1,15 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import process from 'node:process'
-import { ASSETS_DIR_RE, EXT_RE, ROOT_DIR, SRC_DIR_RE } from '../constants'
+import { getUniPaths } from '../common/UniPaths'
+import { ASSETS_DIR_RE, EXT_RE, SRC_DIR_RE } from '../constants'
+import { normalizePath, slash } from './path'
 import * as querystring from './query-string'
+
+export * from './ast'
 
 /** 替换字符串指定位置的字符 */
 export function replaceStringAtPosition(originalStr: string, start: number, end: number, replaceWith: string) {
   return originalStr.substring(0, start) + replaceWith + originalStr.substring(end)
-}
-
-/** 转换为斜杠路径 */
-export function slash(p: string): string {
-  return p.replace(/\\/g, '/')
-}
-
-/** 规范路径 ｜ 处理路径斜杠 */
-export function normalizePath(id: string) {
-  return process.platform === 'win32' ? slash(id) : id
 }
 
 /** 规范函数语法 */
@@ -47,9 +40,13 @@ export function ensureDirectoryExists(filePath: string) {
   }
 }
 
-/** 路径处理器 | 去除`rootDir`前缀路径和查询参数 | `rootDir`默认为项目根目录 */
-export function moduleIdProcessor(id: string, rootDir = ROOT_DIR, removeQuery = true) {
-  rootDir = normalizePath(rootDir)
+/**
+ * 路径处理器
+ *
+ * @description 去除 `rootDir` 前缀路径和查询参数；未传 `rootDir` 时读取 `VITE_ROOT_DIR`
+ */
+export function moduleIdProcessor(id: string, rootDir?: string, removeQuery = true) {
+  rootDir = normalizePath(rootDir ?? getUniPaths().rootDir)
   // 确保 rootDir 以斜杠结尾
   if (!rootDir.endsWith('/'))
     rootDir += '/'
@@ -120,7 +117,7 @@ export function calculateRelativePath(importer: string, imported: string): strin
   const relativePath = path.relative(path.dirname(importer), imported)
 
   // 将路径中的反斜杠替换为正斜杠（适用于 Windows 系统）
-  return relativePath.replace(/\\/g, '/')
+  return slash(relativePath)
 }
 
 /** 处理 src 前缀的路径 */
@@ -200,8 +197,8 @@ export function parseQuerystring(url?: any) {
   }
 }
 
-export * from './ast'
 export * from './lex-parse'
+export * from './path'
 export * from './regexp'
 export * from './uniapp'
 export * from './vite'
