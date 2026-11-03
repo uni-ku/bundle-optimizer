@@ -60,7 +60,7 @@
     "example1:build:mp-weixin": "npm -C examples/vue3+vite+ts run build:mp-weixin"
   },
   "peerDependencies": {
-    "vite": "^4.0.0 || ^5.0.0",
+    "vite": "^4.0.0 || ^5.0.0 || ^6.0.0",
     "vue": "^3.0.0"
   },
   "dependencies": {
@@ -76,7 +76,7 @@
     "@commitlint/config-conventional": "^19.2.2",
     "@types/node": "^22.10.2",
     "@types/nunjucks": "^3.2.6",
-    "bumpp": "^9.9.1",
+    "bumpp": "^11.1.0",
     "commitizen": "^4.3.0",
     "cz-git": "^1.9.1",
     "eslint": "^9.21.0",
@@ -85,8 +85,8 @@
     "simple-git-hooks": "^2.11.1",
     "tsdown": "^0.18.1",
     "typescript": "^5.7.3",
-    "vite": "^4.0.0",
-    "vitest": "0.34.6"
+    "vite": "^6.4.5",
+    "vitest": "^4.1.12"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged",

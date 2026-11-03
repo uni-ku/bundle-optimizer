@@ -5,7 +5,7 @@ import process from 'node:process'
 import { name } from '../package.json'
 import { logger } from './common/Logger'
 import { ParseOptions } from './common/ParseOptions'
-import { getUniPaths } from './common/UniPaths'
+import { tryGetUniPaths } from './common/UniPaths'
 import AsyncComponentProcessor from './plugin/async-component-processor'
 import AsyncImportProcessor from './plugin/async-import-processor'
 import SubPackagesOptimization from './plugin/subpackages-optimization'
@@ -44,8 +44,8 @@ export default (options: IOptions = {}): PluginOption => {
     {
       name: 'optimization:initialized',
       config(config) {
-        // 在 config 阶段校验路径，避免包导入本身依赖 uni-app 环境
-        getUniPaths()
+        // 环境变量已初始化时校验路径；未初始化（如 unh 预生成配置文件的子进程）时静默跳过
+        tryGetUniPaths()
         initializeVitePathResolver(config)
       },
     },
