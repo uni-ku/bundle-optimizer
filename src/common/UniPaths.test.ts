@@ -38,6 +38,15 @@ function setUniPaths(rootDir: string, inputDir: string, outputDir: string) {
   process.env.UNI_OUTPUT_DIR = outputDir
 }
 
+interface InitializedPlugin {
+  name: string
+  config: (config: object) => void
+}
+
+function findInitializedPlugin(plugins: readonly unknown[]): InitializedPlugin | undefined {
+  return plugins.find(plugin => typeof plugin === 'object' && plugin !== null && 'name' in plugin && plugin.name === 'optimization:initialized') as InitializedPlugin | undefined
+}
+
 describe('getUniPaths', () => {
   it('模块导入不依赖 uni-app 环境变量', async () => {
     const { default: Optimization } = await import('../index')
@@ -50,7 +59,20 @@ describe('getUniPaths', () => {
     const { default: Optimization } = await import('../index')
 
     expect(tryGetUniPaths()).toBeUndefined()
-    expect(() => Optimization()).not.toThrow()
+    const plugins = Optimization() as unknown[]
+    const initializedPlugin = findInitializedPlugin(plugins)
+    expect(initializedPlugin).toBeDefined()
+    expect(() => initializedPlugin!.config({})).not.toThrow()
+  })
+
+  it('config 钩子在源码目录越界时仍抛出错误', async () => {
+    const { default: Optimization } = await import('../index')
+    setUniPaths(path.resolve('/project'), path.resolve('/project-x/src'), path.resolve('/project/dist'))
+
+    const plugins = Optimization({ enable: false }) as unknown[]
+    const initializedPlugin = findInitializedPlugin(plugins)
+    expect(initializedPlugin).toBeDefined()
+    expect(() => initializedPlugin!.config({})).toThrow('`UNI_INPUT_DIR` must be inside `VITE_ROOT_DIR`')
   })
 
   it('路径环境变量已初始化但源码目录越界时仍抛出错误', async () => {
